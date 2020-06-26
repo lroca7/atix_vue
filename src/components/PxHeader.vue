@@ -25,11 +25,22 @@
                 @click.stop="drawer = !drawer"
             ></v-app-bar-nav-icon>
             <div class="toolbar">
-                <v-toolbar-title><b>ATIX</b></v-toolbar-title>
+                <v-toolbar-title>
+                    <router-link to="/">
+                        <b>
+                            ATIX
+                        </b>
+                    </router-link>
+                </v-toolbar-title>
                 <v-toolbar-items class="hidden-sm-and-down">
-                    <v-btn text v-for="m in menus" :key="`${m.id}`">
+                    <v-btn
+                        text
+                        v-for="m in menus"
+                        :key="`${m.id}`"
+                        v-on:click="openSubMenu(m.id)"
+                    >
                         <router-link :to="m.slug">
-                            <span v-on:click="openSubMenu(m.id)">
+                            <span>
                                 {{ m.name }}
                             </span>
                         </router-link>
@@ -63,7 +74,7 @@ export default {
     created() {
         let me = this
 
-        fetch('http://127.0.0.1:8000/menu/list')
+        fetch(`${this.$apiUrl}menu/list`)
             .then(response => response.json())
             .then(dataItems => {
                 me.menus = dataItems.data
@@ -74,7 +85,7 @@ export default {
         openSubMenu(menuId) {
             let me = this
 
-            fetch('http://127.0.0.1:8000/menu/submenus/' + menuId)
+            fetch(`${this.$apiUrl}menu/submenus/${menuId}`)
                 .then(response => response.json())
                 .then(dataItems => {
                     if (dataItems.length > 0) {
@@ -89,7 +100,7 @@ export default {
 
 <style>
 .submenu span {
-    color: red;
+    color: #c10000;
     font-size: 0.9rem;
 }
 .toolbar a {

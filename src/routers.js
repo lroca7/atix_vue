@@ -1,9 +1,10 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import Home from '@/views/Home'
-import Product from '@/views/Product'
 import Category from '@/views/Category'
-import CategoryUpdate from '@/views/CategoryUpdate'
+import Product from '@/views/Product'
+import ProductNew from '@/views/ProductNew'
+import ProductUpdate from '@/views/ProductUpdate'
 
 Vue.use(Router)
 
@@ -22,19 +23,24 @@ export default new Router({
             component: Home
         },
         {
-            path: '/products',
-            name: 'product',
-            component: Product
-        },
-        {
             path: '/category',
             name: 'category',
             component: Category
         },
         {
-            path: '/category/:id',
-            name: 'category-update',
-            component: CategoryUpdate
+            path: '/products',
+            name: 'product',
+            component: Product
+        },
+        {
+            path: '/product/new',
+            name: 'product-new',
+            component: ProductNew
+        },
+        {
+            path: '/product/:id',
+            name: 'product-update',
+            component: ProductUpdate
         }
     ]
 })
