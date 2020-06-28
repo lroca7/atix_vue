@@ -5,6 +5,7 @@ import Category from '@/views/Category'
 import Product from '@/views/Product'
 import ProductNew from '@/views/ProductNew'
 import ProductUpdate from '@/views/ProductUpdate'
+import Ingredient from '@/views/Ingredient'
 
 Vue.use(Router)
 
@@ -41,6 +42,11 @@ export default new Router({
             path: '/product/:id',
             name: 'product-update',
             component: ProductUpdate
+        },
+        {
+            path: '/ingredient',
+            name: 'ingredient',
+            component: Ingredient
         }
     ]
 })

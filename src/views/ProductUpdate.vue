@@ -123,10 +123,19 @@
                     </v-form>
                 </v-tab-item>
                 <!--Inventario -->
-                <v-tab-item>
-                    <v-card flat>
-                        <v-card-text>JE</v-card-text>
-                    </v-card>
+                <v-tab-item class="pa-6">
+                    <v-radio-group row v-model="row">
+                        <v-radio
+                            label="Con ingredientes"
+                            value="radio-1"
+                            @click="whitIngredients"
+                        ></v-radio>
+                        <v-radio
+                            label="Sin ingredientes"
+                            value="radio-2"
+                            @click="outIngredients"
+                        ></v-radio>
+                    </v-radio-group>
                 </v-tab-item>
                 <!--Variantes -->
                 <v-tab-item class="pa-6">
@@ -338,7 +347,10 @@ export default {
             // comboOptionsData: []
             comboOptionsObjects: [],
 
-            comboOptionDraws: []
+            comboOptionDraws: [],
+
+            //INGREDIENTES
+            row: false
         }
     },
 
@@ -357,22 +369,6 @@ export default {
         items() {
             console.log('items')
             return this.comboOptions
-            // if (this.entries.length > 0) {
-            //     return this.entries.map(entry => {
-            //         const Description =
-            //             entry.name.length > this.descriptionLimit
-            //                 ? entry.name.slice(0, this.descriptionLimit) + '...'
-            //                 : entry.name
-
-            //         return Object.assign({}, entry, { Description })
-            //     })
-            // }
-
-            // if (this.product.category) {
-            //     return [this.product.category]
-            // }
-
-            // return []
         },
         itemsProductType() {
             console.log('itemsProductType')
@@ -395,27 +391,6 @@ export default {
 
             return []
         }
-        // items3() {
-        //     console.log('items3')
-
-        //     if (this.entries3.length > 0) {
-        //         return this.entries3.map(entry3 => {
-        //             const Description3 =
-        //                 entry3.name.length > this.descriptionLimit
-        //                     ? entry3.name.slice(0, this.descriptionLimit) +
-        //                       '...'
-        //                     : entry3.name
-
-        //             return Object.assign({}, entry3, { Description3 })
-        //         })
-        //     }
-
-        //     if (this.product.comboOptions) {
-        //         return this.product.comboOptions
-        //     }
-
-        //     return []
-        // }
     },
 
     watch: {
@@ -683,6 +658,14 @@ export default {
             })
 
             return comboOptionsData
+        },
+
+        whitIngredients() {
+            console.log('Ingredientes aqui')
+        },
+
+        outIngredients() {
+            console.log('Sin ingredientes ')
         }
     }
 }
