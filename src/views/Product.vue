@@ -8,7 +8,7 @@
             class="elevation-1"
         >
             <template v-slot:top>
-                <v-toolbar flat color="#f6da63">
+                <v-toolbar flat class="toolbar-color">
                     <template>
                         <v-btn
                             color="primary"
@@ -70,7 +70,7 @@ export default {
                 { text: 'Precio', value: 'price' },
                 { text: 'Costo', value: 'cost' },
                 { text: 'Utilidad', value: 'utility' },
-                { text: 'Categoria', value: 'category.name' },
+                { text: 'Categoría', value: 'category.name' },
                 { text: 'Tipo', value: 'type' },
                 { text: 'Estado', value: 'state' },
                 { text: '', value: 'actions', sortable: false }

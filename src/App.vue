@@ -33,7 +33,7 @@
         </v-app-bar> -->
 
         <v-main>
-            <v-container class="main__container" fluid>
+            <v-container class="main__container pa-8" fluid>
                 <router-view></router-view>
             </v-container>
             <!-- <v-container class="fill-height" fluid>
@@ -99,6 +99,9 @@ export default {
 </script>
 
 <style>
+.toolbar-color {
+    background-color: #ffffff;
+}
 a {
     text-decoration: none;
 }
@@ -124,9 +127,9 @@ a {
 }
 /** Fin Estilo del datatable */
 
-.container {
+/* .container {
     padding: 40px !important;
-}
+} */
 .toolbar {
     display: flex;
     justify-content: space-between;
