@@ -10,6 +10,7 @@
                 v-for="table in tables"
                 :key="table.id"
                 :table="table"
+                v-on:updateTables="updateTablesState"
             ></ax-table>
         </v-card>
     </div>
@@ -45,6 +46,10 @@ export default {
                     console.error('Error:', error)
                     alert('Error:', error)
                 })
+        },
+
+        updateTablesState() {
+            this.initialize()
         }
     }
 }

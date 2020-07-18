@@ -215,13 +215,13 @@
             </v-card>
         </v-dialog>
 
-        <v-dialog v-model="dialogInvoice" max-width="50%">
+        <v-dialog v-model="dialogPreInvoice" max-width="50%">
             <v-card>
                 <v-card-title> Pre-Factura - {{ table.name }} </v-card-title>
                 <div class="d-flex flex-row justify-space-between pb-6">
                     <v-card class="invoice-info ma-4 pa-4">
                         <v-autocomplete
-                            v-model="invoice.client"
+                            v-model="preInvoice.client"
                             :items="clients"
                             :loading="isLoadingClient"
                             :search-input.sync="searchClient"
@@ -231,7 +231,7 @@
                             return-object
                         ></v-autocomplete>
                         <v-autocomplete
-                            v-model="invoice.wayToPay"
+                            v-model="preInvoice.wayToPay"
                             :items="paymentMethods"
                             :loading="isLoadingPaymentMethod"
                             :search-input.sync="searchPaymentMethod"
@@ -241,7 +241,7 @@
                             return-object
                         ></v-autocomplete>
                         <v-autocomplete
-                            v-model="invoice.user"
+                            v-model="preInvoice.user"
                             :items="users"
                             :loading="isLoadingUser"
                             :search-input.sync="searchUser"
@@ -285,7 +285,7 @@
                                 Total
                             </v-col>
                             <v-col class="pb-0 d-flex align-center">
-                                {{ totalInvoice | money }}
+                                {{ totalPreInvoice | money }}
                             </v-col>
                         </v-row>
                         <v-row>
@@ -299,7 +299,12 @@
                     </v-card>
                 </div>
                 <div class="d-flex justify-end pa-6">
-                    <v-btn depressed color="secondary" class="mr-4">
+                    <v-btn
+                        depressed
+                        color="secondary"
+                        class="mr-4"
+                        @click="cancelPreInvoice"
+                    >
                         Cancelar
                     </v-btn>
                     <v-btn depressed color="success" @click="newPreInvoice">
@@ -326,10 +331,10 @@ export default {
             totalOrder: 0,
             mode: 0,
             order: {},
-            dialogInvoice: false,
+            dialogPreInvoice: false,
             discountPercentage: null,
             discountCash: null,
-            totalInvoice: null,
+            totalPreInvoice: null,
             tip: null,
 
             //Combo clientes
@@ -359,7 +364,7 @@ export default {
             emptyRules: [v => !!v || 'Is required'],
             valid: true,
 
-            invoice: {
+            preInvoice: {
                 client: {},
                 wayToPay: {},
                 user: {}
@@ -405,6 +410,7 @@ export default {
                 fetch(`${me.$apiUrl}order/by/table/${me.table.number}`)
                     .then(response => response.json())
                     .then(dataItem => {
+                        debugger
                         me.order = dataItem
                         me.productsInOrder = dataItem.items
                         me.mode = 1
@@ -421,6 +427,7 @@ export default {
                     .finally(() => {
                         me.calculateTotalOrder()
                     })
+
             } else {
                 console.log('Reinicicar orden')
                 me.dialogOrder = false
@@ -431,10 +438,10 @@ export default {
                 me.totalOrder = 0
                 me.mode = 0
                 me.order = {}
-                me.dialogInvoice = false
+                me.dialogPreInvoice = false
                 me.discountPercentage = null
                 me.discountCash = null
-                me.totalInvoice = null
+                me.totalPreInvoice = null
                 me.tip = null
 
                 me.clients = []
@@ -444,6 +451,18 @@ export default {
                 me.paymentMethods = []
                 me.isLoadingPaymentMethod = false
                 me.searchPaymentMethod = null
+
+                me.users = []
+                me.isLoadingUser = false
+                me.searchUser = null
+
+                me.preInvoice = {
+                    client: {},
+                    wayToPay: {},
+                    user: {}
+                }
+                //Emitir una actualizacion a tables
+                this.$emit('updateTables')
             }
         },
         filter() {
@@ -459,7 +478,7 @@ export default {
 
             this.discountCash = discount
 
-            this.totalInvoice = this.totalOrder - this.discountCash
+            this.totalPreInvoice = this.totalOrder - this.discountCash
         },
 
         searchClient() {
@@ -506,25 +525,24 @@ export default {
                 .finally(() => (me.isLoadingPaymentMethod = false))
         },
         searchUser() {
-            let me = this
             // Items have already been loaded
             // if (this.itemsClient && this.itemsClient.length > 1) return
 
             // Items have already been requested
-            if (me.isLoadingUser) return
+            if (this.isLoadingUser) return
 
-            me.isLoadingUser = true
+            this.isLoadingUser = true
 
-            fetch(`${me.$apiUrl}user/list`)
+            fetch(`${this.$apiUrl}user/list`)
                 .then(res => res.json())
                 .then(res => {
                     const { data } = res
-                    me.users = data
+                    this.users = data
                 })
                 .catch(err => {
                     console.log(err)
                 })
-                .finally(() => (me.isLoadingUser = false))
+                .finally(() => (this.isLoadingUser = false))
         }
     },
 
@@ -806,7 +824,8 @@ export default {
                 .then(res => res.json())
 
                 .then(() => {
-                    alert('Orden actualizada')
+                    // alert('Orden actualizada')
+                    me.getOrderByTable()
                 })
                 .catch(error => {
                     console.error('Error:', error)
@@ -815,9 +834,11 @@ export default {
         },
 
         sendPreInvoice() {
+            debugger
             let me = this
             if (me.order.id) {
-                me.dialogInvoice = true
+                me.sendOrder()
+                me.dialogPreInvoice = true
             } else {
                 alert('Primero genera la orden')
                 me.generateInvoice = 1
@@ -827,22 +848,25 @@ export default {
         newPreInvoice() {
             let me = this
             debugger
+            if (me.totalPreInvoice === null) {
+                me.totalPreInvoice = me.totalOrder
+            }
             let data = {
                 tableInvoice: me.table.number,
                 order: {
                     id: me.order.id
                 },
                 items: me.productsInOrder,
-                client: me.invoice.client,
-                responsable: me.invoice.user,
-                wayToPay: me.invoice.wayToPay,
+                client: me.preInvoice.client,
+                responsable: me.preInvoice.user,
+                wayToPay: me.preInvoice.wayToPay,
                 discountCash: me.discountCash,
                 discountPercentage: me.discountPercentage,
                 tip: me.tip,
                 subTotal: me.totalOrder,
-                total: me.totalInvoice
+                total: me.totalPreInvoice
             }
-
+            debugger
             fetch(`${me.$apiUrl}preinvoice/new`, {
                 method: 'POST',
                 body: JSON.stringify(data),
@@ -854,6 +878,9 @@ export default {
                 .then(dataItem => {
                     if (dataItem.id) {
                         alert('Pre-Factura generada')
+                        me.dialogPreInvoice = false
+                        me.dialogOrder = false
+
                         window.open(
                             `${me.$apiUrl}preinvoice/print/client/${dataItem.id}`,
                             'blank'
@@ -862,6 +889,9 @@ export default {
                         alert('Error: Al generear pre-factura')
                     }
                 })
+        },
+        cancelPreInvoice() {
+            this.dialogPreInvoice = false
         }
     }
 }
