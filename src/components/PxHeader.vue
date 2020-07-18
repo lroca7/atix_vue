@@ -25,7 +25,7 @@
                 @click.stop="drawer = !drawer"
             ></v-app-bar-nav-icon>
             <div class="toolbar">
-                <v-toolbar-title>
+                <v-toolbar-title class="company_title">
                     <router-link to="/">
                         <b>
                             ATIX
@@ -106,5 +106,9 @@ export default {
 .toolbar a {
     color: #ffffff !important;
     /* text-decoration: none; */
+}
+.company_title a {
+    font-size: 2rem;
+    font-family: 'Anton', Courier, monospace;
 }
 </style>

@@ -121,7 +121,7 @@ export default {
             this.idOption = this.comboCharged.id
         }
 
-        this.$emit('ja', this)
+        this.$emit('createCombo', this)
     },
     computed: {
         items5() {

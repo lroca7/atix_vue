@@ -15,7 +15,7 @@
             </v-tabs>
 
             <v-tabs-items v-model="tab">
-                <!--Genral -->
+                <!--General -->
                 <v-tab-item class="pa-6">
                     <v-form ref="form" v-model="valid" lazy-validation>
                         <v-row>
@@ -107,7 +107,7 @@
                             <p><b>Armar combos</b></p>
                             <div v-for="c in comboOptions" :key="`${c.id}`">
                                 <combo-option
-                                    v-on:ja="updateColor"
+                                    v-on:createCombo="updateColor"
                                     :comboCharged="c"
                                 >
                                 </combo-option>
@@ -124,18 +124,115 @@
                 </v-tab-item>
                 <!--Inventario -->
                 <v-tab-item class="pa-6">
-                    <v-radio-group row v-model="row">
+                    <v-radio-group v-model="radios" :mandatory="false" row>
                         <v-radio
                             label="Con ingredientes"
-                            value="radio-1"
-                            @click="whitIngredients"
+                            value="withIngredient"
                         ></v-radio>
                         <v-radio
                             label="Sin ingredientes"
-                            value="radio-2"
-                            @click="outIngredients"
+                            value="outIngredient"
                         ></v-radio>
                     </v-radio-group>
+
+                    <v-row class="pa-4" v-if="radios === 'withIngredient'">
+                        <v-dialog v-model="dialogIngredient" max-width="700px">
+                            <template v-slot:activator="{ on, attrs }">
+                                <v-btn
+                                    color="info"
+                                    depressed
+                                    class="mb-2"
+                                    v-bind="attrs"
+                                    v-on="on"
+                                    >Agregar ingrediente</v-btn
+                                >
+                            </template>
+                            <v-card>
+                                <v-card-title>
+                                    <span class="headline">
+                                        Agregar ingrediente
+                                    </span>
+                                </v-card-title>
+
+                                <v-card-text>
+                                    <v-container>
+                                        <v-row>
+                                            <v-col cols="6" sm="6" md="6">
+                                                <v-autocomplete
+                                                    v-model="ingredient5"
+                                                    :items="ingredients"
+                                                    :loading="
+                                                        isLoadingIngredient
+                                                    "
+                                                    :search-input.sync="
+                                                        searchIngredient
+                                                    "
+                                                    item-text="name"
+                                                    item-value="id"
+                                                    label="Ingrediente"
+                                                    return-object
+                                                ></v-autocomplete>
+                                            </v-col>
+                                            <v-col cols="4" sm="4" md="4">
+                                                <v-text-field
+                                                    v-model="amountIngredient"
+                                                    label="Cantidad"
+                                                ></v-text-field>
+                                            </v-col>
+                                        </v-row>
+                                    </v-container>
+                                </v-card-text>
+
+                                <v-card-actions>
+                                    <v-spacer></v-spacer>
+                                    <v-btn
+                                        depressed
+                                        color="secondary"
+                                        @click="closeDialogIngredient"
+                                        >Cancelar</v-btn
+                                    >
+                                    <v-btn
+                                        color="primary"
+                                        @click="saveDialogIngredient"
+                                        >Guardar</v-btn
+                                    >
+                                </v-card-actions>
+                            </v-card>
+                        </v-dialog>
+                    </v-row>
+
+                    <v-row>
+                        <v-col cols="6" sm="6" md="6">
+                            <v-simple-table
+                                v-if="
+                                    ingredientesAgregados &&
+                                        ingredientesAgregados.length > 0
+                                "
+                            >
+                                <template v-slot:default>
+                                    <thead>
+                                        <tr>
+                                            <th class="text-left">
+                                                Ingrediente
+                                            </th>
+                                            <th class="text-left">
+                                                Cantidad
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr
+                                            v-for="i in ingredientesAgregados"
+                                            :key="i.ingredient.id"
+                                        >
+                                            <td>{{ i.ingredient.name }}</td>
+                                            <td>{{ i.amount }}</td>
+                                        </tr>
+                                    </tbody>
+                                </template>
+                            </v-simple-table>
+                        </v-col>
+                    </v-row>
                 </v-tab-item>
                 <!--Variantes -->
                 <v-tab-item class="pa-6">
@@ -299,15 +396,11 @@ export default {
             descriptionLimit: 60,
             entries: [],
             entries2: [],
-            // entries3: [],
             isLoading: false,
             isLoadingProductType: false,
-            // isLoading3: false,
             valid: true,
             search: null,
             searchProductType: null,
-            // search3: null,
-
             product: {},
             emptyRules: [v => !!v || 'Is required'],
             showAlert: false,
@@ -350,13 +443,22 @@ export default {
             comboOptionDraws: [],
 
             //INGREDIENTES
-            row: false
+            radios: '',
+            dialogIngredient: false,
+            ingredients: [],
+            itemsIngredient: [],
+            isLoadingIngredient: false,
+            searchIngredient: null,
+            amountIngredient: null,
+
+            ingredient5: {},
+            ingredientesAgregados: [],
+            recipeId: null
         }
     },
 
     computed: {
         fields() {
-            console.log('fields')
             if (!this.category) return []
 
             return Object.keys(this.category).map(key => {
@@ -367,12 +469,13 @@ export default {
             })
         },
         items() {
-            console.log('items')
-            return this.comboOptions
+            if (this.product.category) {
+                return [this.product.category]
+            }
+
+            return []
         },
         itemsProductType() {
-            console.log('itemsProductType')
-
             if (this.entries2.length > 0) {
                 return this.entries2.map(entry2 => {
                     const Description2 =
@@ -395,8 +498,6 @@ export default {
 
     watch: {
         search() {
-            console.log('search')
-
             // Items have already been loaded
             if (this.items && this.items.length > 1) return
 
@@ -419,8 +520,6 @@ export default {
                 .finally(() => (this.isLoading = false))
         },
         searchProductType() {
-            console.log('searchProductType')
-
             // Items have already been loaded
             if (this.itemsProductType && this.itemsProductType.length > 1)
                 return
@@ -443,31 +542,7 @@ export default {
                 })
                 .finally(() => (this.isLoadingProductType = false))
         },
-        search3() {
-            console.log('search3')
 
-            // Items have already been loaded
-            if (this.items3 && this.items3.length > 1) return
-
-            // Items have already been requested
-            if (this.isLoading3) return
-
-            this.isLoading3 = true
-
-            // Lazily load input items
-            fetch(`${this.$apiUrl}product/list`)
-                .then(res => res.json())
-                .then(res => {
-                    // console.log(res)
-                    const { total, data } = res
-                    this.count3 = total
-                    this.entries3 = data
-                })
-                .catch(err => {
-                    console.log(err)
-                })
-                .finally(() => (this.isLoading3 = false))
-        },
         price() {
             this.calculateUtility()
         },
@@ -481,6 +556,33 @@ export default {
                     me.showAlert = false
                 }, 1000)
             }
+        },
+        radios() {
+            console.log(this.radios)
+            if (this.radios === 'withIngredient') {
+                console.log('Lleva ingredientes')
+            }
+        },
+        searchIngredient() {
+            // Items have already been loaded
+            if (this.itemsIngredient && this.itemsIngredient.length > 1) return
+
+            // Items have already been requested
+            if (this.isLoadingIngredient) return
+
+            this.isLoadingIngredient = true
+
+            // Lazily load input items
+            fetch(`${this.$apiUrl}ingredient/list`)
+                .then(res => res.json())
+                .then(res => {
+                    const { data } = res
+                    this.ingredients = data
+                })
+                .catch(err => {
+                    console.log(err)
+                })
+                .finally(() => (this.isLoadingIngredient = false))
         }
     },
 
@@ -497,14 +599,18 @@ export default {
                 .then(dataItem => {
                     me.product = dataItem
 
-                    // me.entries = [dataItem.category]
-
                     me.getSubproducts()
 
                     if (dataItem.comboOptions) {
                         me.comboOptions = dataItem.comboOptions
                     } else {
                         me.comboOptions.push(me.comboOptionsDefault)
+                    }
+
+                    if (dataItem.recipe) {
+                        me.radios = 'withIngredient'
+                        me.recipeId = dataItem.recipe.id
+                        me.ingredientesAgregados = dataItem.recipe.ingredients
                     }
                 })
         },
@@ -523,10 +629,17 @@ export default {
             let data = me.product
             data.comboOptions = this.getComboOptionValues()
 
-            console.log(data)
             const id = this.$route.params.id
 
+            data.recipe = {
+                name: `Receta - ${me.product.name}`,
+                ingredients: this.ingredientesAgregados
+            }
             debugger
+            if (me.recipeId) {
+                data.recipe.id = me.recipeId
+            }
+
             fetch(`${this.$apiUrl}product/${id}`, {
                 method: 'PUT',
                 body: JSON.stringify(data),
@@ -572,7 +685,6 @@ export default {
         },
 
         saveDialog() {
-            console.log('Guardar subproduct')
             let me = this
 
             me.editedItem.product = { id: me.product.id }
@@ -644,8 +756,6 @@ export default {
         },
 
         updateColor(comboOp) {
-            console.log('ComboOption')
-            console.log(comboOp)
             this.comboOptionsObjects.push(comboOp)
         },
 
@@ -660,12 +770,22 @@ export default {
             return comboOptionsData
         },
 
-        whitIngredients() {
-            console.log('Ingredientes aqui')
+        closeDialogIngredient() {
+            this.dialogIngredient = false
         },
 
-        outIngredients() {
-            console.log('Sin ingredientes ')
+        saveDialogIngredient() {
+            let me = this
+
+            let i = {
+                ingredient: {
+                    id: this.ingredient5.id,
+                    name: this.ingredient5.name
+                },
+                amount: this.amountIngredient
+            }
+
+            me.ingredientesAgregados.push(i)
         }
     }
 }

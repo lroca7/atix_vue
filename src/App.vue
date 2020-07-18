@@ -1,5 +1,5 @@
 <template>
-    <v-app id="inspire">
+    <v-app id="inspire" class="jajajaja">
         <!-- <v-navigation-drawer v-model="drawer" temporary="temporary" app>
             <v-list dense>
                 <v-list-item link>
@@ -99,6 +99,9 @@ export default {
 </script>
 
 <style>
+html {
+    font-size: 18px;
+}
 .toolbar-color {
     background-color: #ffffff;
 }
@@ -120,6 +123,12 @@ a {
 .v-data-table-header span {
     font-size: 1rem;
 }
+
+#products-datatable td {
+    padding-top: 1% !important;
+    padding-bottom: 1% !important;
+}
+
 @media screen and (max-width: 767px) {
     .data__table--actions {
         display: flex;

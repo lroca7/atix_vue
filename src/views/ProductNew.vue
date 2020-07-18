@@ -106,7 +106,7 @@
                             <p><b>Armar combos</b></p>
                             <div v-for="c in comboOptions" :key="`${c.id}`">
                                 <combo-option
-                                    v-on:ja="updateColor"
+                                    v-on:createCombo="updateColor"
                                     :comboCharged="c"
                                 >
                                 </combo-option>

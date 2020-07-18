@@ -2,10 +2,12 @@
     <div>
         <h5 class="subtitles">Productos</h5>
         <v-data-table
+            id="products-datatable"
             :headers="headers"
             :items="products"
             :items-per-page="10"
             class="elevation-1"
+            :search="filter"
         >
             <template v-slot:top>
                 <v-toolbar flat class="toolbar-color">
@@ -17,6 +19,14 @@
                             @click="newItem()"
                             >Nuevo</v-btn
                         >
+                        <v-text-field
+                            class="ml-6"
+                            v-model="filter"
+                            append-icon="mdi-magnify"
+                            label="Buscar ..."
+                            single-line
+                            hide-details
+                        ></v-text-field>
                     </template>
                 </v-toolbar>
             </template>
@@ -51,7 +61,7 @@
 </template>
 
 <script>
-import configService from '@/services/config'
+import numeral from 'numeral'
 
 export default {
     name: 'Product',
@@ -59,21 +69,63 @@ export default {
 
     data() {
         return {
+            filter: '',
             headers: [
                 {
                     text: 'Código',
                     align: 'start',
                     sortable: true,
-                    value: 'code'
+                    value: 'code',
+                    width: '1%'
                 },
-                { text: 'Nombre', value: 'name' },
-                { text: 'Precio', value: 'price' },
-                { text: 'Costo', value: 'cost' },
-                { text: 'Utilidad', value: 'utility' },
-                { text: 'Categoría', value: 'category.name' },
-                { text: 'Tipo', value: 'type' },
-                { text: 'Estado', value: 'state' },
-                { text: '', value: 'actions', sortable: false }
+                {
+                    text: 'Nombre',
+                    value: 'fullname',
+                    width: '3%'
+                },
+                {
+                    text: 'Precio',
+                    value: 'price',
+                    filterable: false,
+                    width: '1%'
+                },
+                {
+                    text: 'Costo',
+                    value: 'cost',
+                    filterable: false,
+                    width: '1%'
+                },
+                {
+                    text: 'Utilidad',
+                    value: 'utility',
+                    filterable: false,
+                    width: '1%'
+                },
+                {
+                    text: 'Categoría',
+                    value: 'category.name',
+                    filterable: false,
+                    width: '1%'
+                },
+                {
+                    text: 'Tipo',
+                    value: 'productType.name',
+                    filterable: false,
+                    width: '1%'
+                },
+                {
+                    text: 'Padre',
+                    value: 'parentProduct.name',
+                    filterable: false,
+                    width: '1%'
+                },
+                {
+                    text: 'Estado',
+                    value: 'state',
+                    filterable: false,
+                    width: '1%'
+                },
+                { text: '', value: 'actions', sortable: false, width: '7%' }
             ],
             products: []
         }
@@ -82,11 +134,25 @@ export default {
     created() {
         let me = this
 
-        fetch(configService.apiUrl + 'product/list')
+        fetch(this.$apiUrl + 'product/list')
             .then(response => response.json())
             .then(dataItems => {
                 me.products = dataItems.data
+                me.products.map(function(obj) {
+                    obj.price = me.moneyFormat(obj.price)
+                    obj.cost = me.moneyFormat(obj.cost)
+                    obj.utility = me.moneyFormat(obj.utility)
+                    if (obj.parentProduct) {
+                        obj.name = me.productName(obj)
+                    }
+                    return obj
+                })
             })
+
+        // debugger
+
+        let money = me.moneyFormat(5000)
+        console.log(money)
     },
 
     methods: {
@@ -111,6 +177,19 @@ export default {
             const index = this.products.indexOf(item)
             confirm('Are you sure you want to delete this item?') &&
                 this.products.splice(index, 1)
+        },
+
+        moneyFormat(value) {
+            if (!value) {
+                return '$0'
+            }
+
+            return numeral(value).format('($ 0,0[.]00)')
+        },
+
+        productName(product) {
+            let name = product.name + ' - ' + product.parentProduct.name
+            return name
         }
     }
 }

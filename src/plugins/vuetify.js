@@ -13,7 +13,9 @@ export default new Vuetify({
                 error: '#f44336',
                 warning: '#ffc107',
                 info: '#009688',
-                success: '#4caf50'
+                success: '#4caf50',
+                orange: '#FF9800',
+                green: '#64DD17'
             }
         }
     }

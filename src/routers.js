@@ -6,6 +6,7 @@ import Product from '@/views/Product'
 import ProductNew from '@/views/ProductNew'
 import ProductUpdate from '@/views/ProductUpdate'
 import Ingredient from '@/views/Ingredient'
+import Tables from '@/views/Tables'
 
 Vue.use(Router)
 
@@ -29,7 +30,7 @@ export default new Router({
             component: Category
         },
         {
-            path: '/products',
+            path: '/product',
             name: 'product',
             component: Product
         },
@@ -47,6 +48,11 @@ export default new Router({
             path: '/ingredient',
             name: 'ingredient',
             component: Ingredient
+        },
+        {
+            path: '/tables',
+            name: 'tables',
+            component: Tables
         }
     ]
 })
