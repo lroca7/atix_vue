@@ -1,8 +1,12 @@
 import Vue from 'vue'
-import App from './App.vue'
+import App from '@/App.vue'
 import vuetify from './plugins/vuetify'
 import router from '@/routers'
 import { dollarFilter, percentFilter } from '@/filters'
+
+import EventBus from '@/plugins/event-bus'
+
+Vue.use(EventBus)
 
 Vue.filter('money', dollarFilter)
 Vue.filter('percent', percentFilter)
