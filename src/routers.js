@@ -7,6 +7,7 @@ import ProductNew from '@/views/ProductNew'
 import ProductUpdate from '@/views/ProductUpdate'
 import Ingredient from '@/views/Ingredient'
 import Tables from '@/views/Tables'
+import PreInvoice from '@/views/PreInvoice'
 
 Vue.use(Router)
 
@@ -53,6 +54,11 @@ export default new Router({
             path: '/tables',
             name: 'tables',
             component: Tables
+        },
+        {
+            path: '/preinvoices',
+            name: 'PreInvoice',
+            component: PreInvoice
         }
     ]
 })

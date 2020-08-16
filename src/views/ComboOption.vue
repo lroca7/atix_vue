@@ -30,7 +30,7 @@
                                     :items="items5"
                                     :loading="isLoading5"
                                     :search-input.sync="search5"
-                                    item-text="name"
+                                    item-text="fullname"
                                     item-value="id"
                                     label="Producto"
                                     return-object
