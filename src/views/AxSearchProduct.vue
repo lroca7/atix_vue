@@ -12,8 +12,11 @@
         <v-col>
             <v-chip
                 class="chips-categories ma-2"
+                
                 v-for="category in categories"
                 :key="category.id"
+                
+                @click="filterByCategory(category, $event)"
             >
                 {{ category.name }}
             </v-chip>
@@ -50,7 +53,8 @@ export default {
             products: [],
             productsInOrder: [],
 
-            categories: []
+            categories: [],
+            activeChip: false
         }
     },
 
@@ -123,17 +127,38 @@ export default {
 
         addProductToOrder(product) {
             this.$bus.$emit('addProductToOrder', product)
+        },
+
+        filterByCategory(category, event) {
+            console.log(this)
+            console.log(event)
+            let me = this
+            fetch(`${me.$apiUrl}product/list/by/category/${category.id}`)
+                .then(response => response.json())
+                .then(dataItems => {
+                    me.products = dataItems.data
+                    me.allProducts = dataItems.data
+
+                    me.products.map(function(obj) {
+                        if (obj.parentProduct) {
+                            let name = obj.name + ' - ' + obj.parentProduct.name
+                            obj.name = name
+                        }
+                        return obj
+                    })
+                    me.loading = false
+                })
         }
     }
 }
 </script>
 
 <style scoped>
-.bar-search {
-    background: gray;
+.v-text-field__details {
+    display: none !important;
 }
 .search-results {
-    background: greenyellow;
+    /* background: greenyellow; */
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
