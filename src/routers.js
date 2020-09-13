@@ -9,6 +9,7 @@ import Unit from '@/views/Unit'
 import Ingredient from '@/views/Ingredient'
 import Tables from '@/views/Tables'
 import Orders from '@/views/Orders'
+import PreInvoice from '@/views/PreInvoice'
 
 Vue.use(Router)
 
@@ -65,6 +66,11 @@ export default new Router({
             path: '/orders',
             name: 'orders',
             component: Orders
+        },
+        {
+            path: '/preinvoices',
+            name: 'PreInvoice',
+            component: PreInvoice
         }
     ]
 })

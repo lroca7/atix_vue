@@ -97,6 +97,12 @@ export default {
 </script>
 
 <style>
+/* @font-face {
+    font-family: 'Blanka';
+    
+    src: url("assets/fonts/Roboto-Light.woff2") format("woff2");
+} */
+
 .submenu span {
     color: #c10000;
     font-size: 0.9rem;
@@ -114,5 +120,7 @@ export default {
 }
 .company_title img {
     width: 45%;
+    /* font-family: 'Anton', Courier, monospace; */
+    /* font-family: 'Blanka', Helvetica, Arial; */
 }
 </style>
