@@ -46,7 +46,6 @@
                         </router-link>
                     </v-btn>
                 </v-toolbar-items>
-
             </div>
         </v-app-bar>
     </div>

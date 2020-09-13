@@ -427,7 +427,6 @@ export default {
                     .finally(() => {
                         me.calculateTotalOrder()
                     })
-
             } else {
                 console.log('Reinicicar orden')
                 me.dialogOrder = false

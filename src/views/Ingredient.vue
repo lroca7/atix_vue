@@ -166,7 +166,7 @@ export default {
             { text: 'Unidad', value: 'unit.shortName', width: '1%' },
             { text: 'Costo', value: 'cost', width: '1%' },
             { text: 'Stock', value: 'stock', width: '1%' },
-            { text: 'Stock Minimo', value: 'minStock', width: '1%' },
+            // { text: 'Stock Minimo', value: 'minStock', width: '1%' },
             { text: 'Estado', value: 'state', width: '1%' },
             { text: 'Acciones', value: 'actions', sortable: false, width: '2%' }
         ],

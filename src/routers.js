@@ -5,8 +5,10 @@ import Category from '@/views/Category'
 import Product from '@/views/Product'
 import ProductNew from '@/views/ProductNew'
 import ProductUpdate from '@/views/ProductUpdate'
+import Unit from '@/views/Unit'
 import Ingredient from '@/views/Ingredient'
 import Tables from '@/views/Tables'
+import Orders from '@/views/Orders'
 
 Vue.use(Router)
 
@@ -45,6 +47,11 @@ export default new Router({
             component: ProductUpdate
         },
         {
+            path: '/unit',
+            name: 'unit',
+            component: Unit
+        },
+        {
             path: '/ingredient',
             name: 'ingredient',
             component: Ingredient
@@ -53,6 +60,11 @@ export default new Router({
             path: '/tables',
             name: 'tables',
             component: Tables
+        },
+        {
+            path: '/orders',
+            name: 'orders',
+            component: Orders
         }
     ]
 })

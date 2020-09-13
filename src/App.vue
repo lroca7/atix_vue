@@ -77,6 +77,10 @@ a {
     font-size: 1rem;
 }
 
+.main__container {
+    background: #FAFBFD;
+}
+
 #products-datatable td {
     padding-top: 1% !important;
     padding-bottom: 1% !important;

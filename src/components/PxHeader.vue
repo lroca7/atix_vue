@@ -20,16 +20,14 @@
         </v-navigation-drawer>
 
         <v-app-bar app class="wine-ligth">
-            <v-app-bar-nav-icon
+            <!-- <v-app-bar-nav-icon
                 class="menu-icon"
                 @click.stop="drawer = !drawer"
-            ></v-app-bar-nav-icon>
+            ></v-app-bar-nav-icon> -->
             <div class="toolbar">
                 <v-toolbar-title class="company_title">
                     <router-link to="/">
-                        <b>
-                            ATIX
-                        </b>
+                        <img src="../assets/logo_atix.svg" />
                     </router-link>
                 </v-toolbar-title>
                 <v-toolbar-items class="hidden-sm-and-down">
@@ -110,5 +108,11 @@ export default {
 .company_title a {
     font-size: 2rem;
     font-family: 'Anton', Courier, monospace;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.company_title img {
+    width: 45%;
 }
 </style>
