@@ -1,5 +1,5 @@
 <template>
-    <v-card class="search-products">
+    <div class="search-products">
         <v-col class="bar-search pb-0" cols="12" sm="12" md="12">
             <v-text-field
                 label="Buscar"
@@ -35,7 +35,7 @@
                 <p class="text-center">{{ product.name }}</p>
             </v-card>
         </v-col>
-    </v-card>
+    </div>
 </template>
 
 <script>
@@ -130,13 +130,18 @@ export default {
 
 <style scoped>
 .bar-search {
-    background: gray;
+    background: #E0E0E0;
+    border-radius: 0;
+}
+.search-products {
+    width: 60%;
 }
 .search-results {
-    background: greenyellow;
+    /* background: greenyellow; */
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
+    /* max-height: 500px; */
 }
 .search-results > .result-product {
     width: 150px;
@@ -148,7 +153,7 @@ export default {
     margin: 5px;
 }
 .search-results > .result-product .result-product--img {
-    width: 80%;
+    width: 70%;
 }
 .chips-categories {
     cursor: pointer;

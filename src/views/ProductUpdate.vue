@@ -186,15 +186,15 @@
                                 <v-card-actions>
                                     <v-spacer></v-spacer>
                                     <v-btn
+                                        color="primary"
+                                        @click="saveDialogIngredient"
+                                        >Guardar</v-btn
+                                    >
+                                    <v-btn
                                         depressed
                                         color="secondary"
                                         @click="closeDialogIngredient"
                                         >Cancelar</v-btn
-                                    >
-                                    <v-btn
-                                        color="primary"
-                                        @click="saveDialogIngredient"
-                                        >Guardar</v-btn
                                     >
                                 </v-card-actions>
                             </v-card>
@@ -309,17 +309,17 @@
                                         </v-card-text>
 
                                         <v-card-actions>
-                                            <v-spacer></v-spacer>
+                                            <v-spacer></v-spacer>                                            
+                                            <v-btn
+                                                color="primary"
+                                                @click="saveDialog"
+                                                >Guardar</v-btn
+                                            >
                                             <v-btn
                                                 depressed
                                                 color="secondary"
                                                 @click="closeDialog"
                                                 >Cancelar</v-btn
-                                            >
-                                            <v-btn
-                                                color="primary"
-                                                @click="saveDialog"
-                                                >Guardar</v-btn
                                             >
                                         </v-card-actions>
                                     </v-card>
@@ -361,11 +361,11 @@
 
                 <v-card-actions class="pa-6">
                     <v-spacer></v-spacer>
-                    <v-btn depressed color="secondary" @click="goBack">
-                        Cancelar
-                    </v-btn>
                     <v-btn depressed color="primary" @click="save">
                         Guardar
+                    </v-btn>
+                    <v-btn depressed color="secondary" @click="goBack">
+                        Cancelar
                     </v-btn>
                 </v-card-actions>
             </v-tabs-items>

@@ -161,3 +161,15 @@ export default {
     }
 }
 </script>
+
+<style scoped>
+.order-resume {
+    width: 40%;
+    background-color: #b3e5fc;
+    border-radius: 0;
+}
+.subtitles {
+    margin-top: 10px;
+    margin-bottom: 20px;
+}
+</style>

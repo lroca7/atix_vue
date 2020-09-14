@@ -11,7 +11,7 @@
             />
             <p>{{ table.name }}</p>
         </v-card>
-        <v-dialog v-model="dialogOrder" max-width="90%">
+        <!-- <v-dialog v-model="dialogOrder" max-width="90%">
             <v-card>
                 <v-card-title> {{ table.name }} </v-card-title>
 
@@ -21,16 +21,16 @@
                     <AxOrder v-bind:table="table" />
                 </v-card>
             </v-card>
-        </v-dialog>
+        </v-dialog> -->
     </div>
 </template>
 
 <script>
-import AxSearchProduct from '@/views/AxSearchProduct.vue'
-import AxOrder from '@/views/AxOrder.vue'
+// import AxSearchProduct from '@/views/AxSearchProduct.vue'
+// import AxOrder from '@/views/AxOrder.vue'
 export default {
     name: 'AxTable',
-    components: { AxSearchProduct, AxOrder },
+    // components: { AxSearchProduct, AxOrder },
     props: ['table', 'orders'],
     data() {
         return {
@@ -93,13 +93,13 @@ export default {
 
     computed: {
         classObject() {
-            //Mesta Activa
+            //Mesa Activa
             if (this.table.state === 2) {
-                return 'light-green accent-3'
+                return 'green-table'
             }
             //Mesa pre-factuarada
             if (this.table.state === 3) {
-                return 'yellow'
+                return 'yellow-table'
             }
 
             return 'white'
@@ -109,60 +109,65 @@ export default {
     watch: {
         dialogOrder() {
             let me = this
-            if (me.dialogOrder) {
-                fetch(`${me.$apiUrl}product/list`)
-                    .then(response => response.json())
-                    .then(dataItems => {
-                        me.products = dataItems.data
-                        me.allProducts = dataItems.data
+            console.log(me)
+            this.$router.push({
+                name: 'tabledetail',
+                params: { id: this.table.number, table: this.table },
+            })
+            // if (me.dialogOrder) {
+            //     fetch(`${me.$apiUrl}product/list`)
+            //         .then(response => response.json())
+            //         .then(dataItems => {
+            //             me.products = dataItems.data
+            //             me.allProducts = dataItems.data
 
-                        me.products.map(function(obj) {
-                            if (obj.parentProduct) {
-                                let name =
-                                    obj.name + ' - ' + obj.parentProduct.name
-                                obj.name = name
-                            }
-                            return obj
-                        })
-                    })
+            //             me.products.map(function(obj) {
+            //                 if (obj.parentProduct) {
+            //                     let name =
+            //                         obj.name + ' - ' + obj.parentProduct.name
+            //                     obj.name = name
+            //                 }
+            //                 return obj
+            //             })
+            //         })
 
-                me.getOrderByTable()
-            } else {
-                console.log('Reinicicar orden')
-                me.dialogOrder = false
-                me.products = []
-                me.allProducts = []
-                me.filter = ''
-                me.productsInOrder = []
-                me.totalOrder = 0
-                me.mode = 0
-                me.order = {}
-                me.dialogPreInvoice = false
-                me.discountPercentage = null
-                me.discountCash = null
-                me.totalPreInvoice = null
-                me.tip = null
+            //     me.getOrderByTable()
+            // } else {
+                // console.log('Reinicicar orden')
+                // me.dialogOrder = false
+                // me.products = []
+                // me.allProducts = []
+                // me.filter = ''
+                // me.productsInOrder = []
+                // me.totalOrder = 0
+                // me.mode = 0
+                // me.order = {}
+                // me.dialogPreInvoice = false
+                // me.discountPercentage = null
+                // me.discountCash = null
+                // me.totalPreInvoice = null
+                // me.tip = null
 
-                me.clients = []
-                me.isLoadingClient = false
-                me.searchClient = null
+                // me.clients = []
+                // me.isLoadingClient = false
+                // me.searchClient = null
 
-                me.paymentMethods = []
-                me.isLoadingPaymentMethod = false
-                me.searchPaymentMethod = null
+                // me.paymentMethods = []
+                // me.isLoadingPaymentMethod = false
+                // me.searchPaymentMethod = null
 
-                me.users = []
-                me.isLoadingUser = false
-                me.searchUser = null
+                // me.users = []
+                // me.isLoadingUser = false
+                // me.searchUser = null
 
-                me.preInvoice = {
-                    client: {},
-                    wayToPay: {},
-                    user: {}
-                }
-                //Emitir una actualizacion a tables
-                this.$emit('updateTables')
-            }
+                // me.preInvoice = {
+                //     client: {},
+                //     wayToPay: {},
+                //     user: {}
+                // }
+                // //Emitir una actualizacion a tables
+                // this.$emit('updateTables')
+            // }
         },
         filter() {
             let me = this
@@ -468,10 +473,6 @@ export default {
 .search-products {
     box-shadow: none !important;
 }
-.order-resume {
-    background-color: #b3e5fc;
-    width: 40%;
-}
 .dialog-order {
     min-height: 80vh;
     width: 60%;
@@ -489,5 +490,13 @@ export default {
 }
 .wrapper-order > .search-products {
     width: 80%;
+}
+
+.green-table {
+    background: #92dfa9;
+}
+
+.yellow-table {
+    background: #f3ea82;
 }
 </style>

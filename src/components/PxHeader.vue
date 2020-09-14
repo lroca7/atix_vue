@@ -8,7 +8,7 @@
                     </v-list-item-action>
                     <v-list-item-content>
                         <v-list-item-title>
-                            <router-link :to="s.slug">
+                            <router-link :to="`./${s.slug}`">
                                 <span>
                                     {{ s.name }}
                                 </span>

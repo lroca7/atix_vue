@@ -10,6 +10,7 @@ import Ingredient from '@/views/Ingredient'
 import Tables from '@/views/Tables'
 import Orders from '@/views/Orders'
 import PreInvoice from '@/views/PreInvoice'
+import TableDetail from '@/views/AxTableDetail'
 
 Vue.use(Router)
 
@@ -61,6 +62,12 @@ export default new Router({
             path: '/tables',
             name: 'tables',
             component: Tables
+        },
+        {
+            path: '/table/:id',
+            name: 'tabledetail',
+            component: TableDetail,
+            props: true
         },
         {
             path: '/orders',

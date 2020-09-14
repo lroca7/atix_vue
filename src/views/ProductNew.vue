@@ -122,11 +122,11 @@
                     </v-form>
                     <v-card-actions>
                         <v-spacer></v-spacer>
-                        <v-btn depressed color="secondary" @click="goBack">
-                            Cancelar
-                        </v-btn>
                         <v-btn depressed color="primary" @click="save">
                             Guardar
+                        </v-btn>
+                        <v-btn depressed color="secondary" @click="goBack">
+                            Cancelar
                         </v-btn>
                     </v-card-actions>
                 </v-tab-item>
