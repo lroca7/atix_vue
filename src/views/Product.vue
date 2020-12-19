@@ -113,12 +113,12 @@ export default {
                     filterable: false,
                     width: '1%'
                 },
-                {
-                    text: 'Padre',
-                    value: 'parentProduct.name',
-                    filterable: false,
-                    width: '1%'
-                },
+                // {
+                //     text: 'Padre',
+                //     value: 'parentProduct.name',
+                //     filterable: false,
+                //     width: '1%'
+                // },
                 {
                     text: 'Estado',
                     value: 'state',

@@ -6,6 +6,8 @@ import { dollarFilter, percentFilter } from '@/filters'
 
 import EventBus from '@/plugins/event-bus'
 
+
+
 Vue.use(EventBus)
 
 Vue.filter('money', dollarFilter)

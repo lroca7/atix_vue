@@ -70,7 +70,7 @@
             <p class="subtitles mt-6">Total: {{ totalOrder | money }}</p>
 
             <div class="d-flex justify-space-between mt-10">
-                <v-btn depressed color="info">
+                <v-btn depressed color="info" @click="sendOrder">
                     Hacer pedido
                 </v-btn>
                 <v-btn depressed color="orange">
@@ -85,14 +85,21 @@
 </template>
 
 <script>
+
 export default {
     name: 'AxOrder',
     props: ['table'],
-    components: {},
     data() {
         return {
             productsInOrder: [],
-            totalOrder: 0
+            totalOrder: 0,
+            order: {
+                id: null
+            },
+
+            showAlert: false,
+            alertType: null,
+            alertText: null
         }
     },
 
@@ -100,6 +107,17 @@ export default {
         this.$bus.$on('addProductToOrder', product => {
             this.addProduct(product)
         })
+
+        this.showAlert = true
+        this.alertType = 'success'
+        this.alertText = 'Hola q tal'
+
+        this.$notify({
+            group: 'foo',
+            title: 'Important message',
+            text: 'Hello user! This is a notification!'
+        })
+
     },
 
     methods: {
@@ -157,7 +175,49 @@ export default {
             }
 
             console.log('Total orden: ', me.totalOrder)
-        }
+        },
+
+        sendOrder() {
+            let me = this
+
+            let data = {
+                products: me.productsInOrder,
+                total: me.totalOrder,
+                tableNumber: me.table.number,
+                table: me.table
+            }
+
+            if (me.order.id) {
+                me.updateOrder(data)
+            } else {
+                me.newOrder(data)
+            }
+        },
+
+        newOrder(data) {
+            let me = this
+
+            fetch(`${me.$apiUrl}order/new`, {
+                method: 'POST',
+                body: JSON.stringify(data),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then(res => res.json())
+                .then(dataItem => {
+                    me.order = dataItem
+                    alert('Orden creada exitosamente')
+                })
+                .catch(error => {
+                    console.error('Error:', error)
+                    alert('Error:', error)
+                })
+                .finally(() => {
+                    me.dialogOrder = false
+                })
+        },
+
     }
 }
 </script>
