@@ -8,7 +8,7 @@
                     </v-list-item-action>
                     <v-list-item-content>
                         <v-list-item-title>
-                            <router-link :to="`./${s.slug}`">
+                            <router-link :to="`/${s.slug}`">
                                 <span>
                                     {{ s.name }}
                                 </span>
@@ -37,7 +37,7 @@
                         :key="`${m.id}`"
                         v-on:click="openSubMenu(m.id)"
                     >
-                        <router-link :to="m.slug">
+                        <router-link :to="`/${m.slug}`">
                             <span>
                                 {{ m.name }}
                             </span>

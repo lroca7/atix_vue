@@ -1,7 +1,7 @@
 <template>
     <v-card>
-        <v-card-title> {{ table.name }} </v-card-title>
-
+        <!-- <v-card-title> {{ table.name }} </v-card-title> -->
+        <v-card-title> Hola q tal </v-card-title>
         <v-card class="wrapper-order pb-6">
             <AxSearchProduct />
 
@@ -19,19 +19,17 @@ export default {
     props: ['table', 'orders'],
 
     created() {
-
-        if ( this.table === undefined) {
-           this.$router.push({
+        if (this.table === undefined) {
+            this.$router.push({
                 name: 'tables'
             })
         }
-    },
-
+    }
 }
 </script>
 
 <style scoped>
-.wrapper-order{
+.wrapper-order {
     display: flex;
 }
 </style>

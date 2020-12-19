@@ -43,7 +43,7 @@ export default {
                     text: 'Fecha',
                     align: 'start',
                     sortable: true,
-                    value: 'entrydate.date',
+                    value: 'entrydate',
                     width: '1%'
                 },
                 {
@@ -79,6 +79,10 @@ export default {
             .then(response => response.json())
             .then(dataItems => {
                 me.orders = dataItems.data
+                me.orders.map(function(obj) {
+                    obj.total = me.moneyFormat(obj.total)
+                    return obj
+                })
             })
 
         // debugger

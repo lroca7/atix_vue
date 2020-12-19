@@ -11,17 +11,12 @@
             />
             <p>{{ table.name }}</p>
         </v-card>
-        <!-- <v-dialog v-model="dialogOrder" max-width="90%">
-            <v-card>
-                <v-card-title> {{ table.name }} </v-card-title>
-
-                <v-card class="wrapper-order pb-6">
-                    <AxSearchProduct />
-
-                    <AxOrder v-bind:table="table" />
-                </v-card>
-            </v-card>
-        </v-dialog> -->
+         <v-dialog
+            class="pre-invoice"
+            v-model="dialogPreInvoice"
+            max-width="50%"
+        >
+         </v-dialog>
     </div>
 </template>
 
@@ -112,7 +107,7 @@ export default {
             console.log(me)
             this.$router.push({
                 name: 'tabledetail',
-                params: { id: this.table.number, table: this.table },
+                params: { id: this.table.number, table: this.table }
             })
             // if (me.dialogOrder) {
             //     fetch(`${me.$apiUrl}product/list`)
@@ -133,40 +128,40 @@ export default {
 
             //     me.getOrderByTable()
             // } else {
-                // console.log('Reinicicar orden')
-                // me.dialogOrder = false
-                // me.products = []
-                // me.allProducts = []
-                // me.filter = ''
-                // me.productsInOrder = []
-                // me.totalOrder = 0
-                // me.mode = 0
-                // me.order = {}
-                // me.dialogPreInvoice = false
-                // me.discountPercentage = null
-                // me.discountCash = null
-                // me.totalPreInvoice = null
-                // me.tip = null
+            // console.log('Reinicicar orden')
+            // me.dialogOrder = false
+            // me.products = []
+            // me.allProducts = []
+            // me.filter = ''
+            // me.productsInOrder = []
+            // me.totalOrder = 0
+            // me.mode = 0
+            // me.order = {}
+            // me.dialogPreInvoice = false
+            // me.discountPercentage = null
+            // me.discountCash = null
+            // me.totalPreInvoice = null
+            // me.tip = null
 
-                // me.clients = []
-                // me.isLoadingClient = false
-                // me.searchClient = null
+            // me.clients = []
+            // me.isLoadingClient = false
+            // me.searchClient = null
 
-                // me.paymentMethods = []
-                // me.isLoadingPaymentMethod = false
-                // me.searchPaymentMethod = null
+            // me.paymentMethods = []
+            // me.isLoadingPaymentMethod = false
+            // me.searchPaymentMethod = null
 
-                // me.users = []
-                // me.isLoadingUser = false
-                // me.searchUser = null
+            // me.users = []
+            // me.isLoadingUser = false
+            // me.searchUser = null
 
-                // me.preInvoice = {
-                //     client: {},
-                //     wayToPay: {},
-                //     user: {}
-                // }
-                // //Emitir una actualizacion a tables
-                // this.$emit('updateTables')
+            // me.preInvoice = {
+            //     client: {},
+            //     wayToPay: {},
+            //     user: {}
+            // }
+            // //Emitir una actualizacion a tables
+            // this.$emit('updateTables')
             // }
         },
         filter() {
@@ -480,9 +475,20 @@ export default {
 .ax-table {
     width: 200px;
     height: 200px;
+    cursor: pointer;
 }
 .ax-table--img {
     width: 60%;
+}
+.ax-table:hover {
+    -webkit-box-shadow: 0px 0px 4px 2px rgba(146, 223, 169, 1);
+    -moz-box-shadow: 0px 0px 4px 2px rgba(146, 223, 169, 1);
+    box-shadow: 0px 0px 4px 2px rgba(146, 223, 169, 1);
+}
+.ax-table.green-table:hover {
+    -webkit-box-shadow: 0px 0px 4px 2px rgba(146, 223, 169, 1);
+    -moz-box-shadow: 0px 0px 4px 2px rgba(146, 223, 169, 1);
+    box-shadow: 0px 0px 4px 2px rgba(146, 223, 169, 1);
 }
 
 .wrapper-order {

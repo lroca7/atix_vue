@@ -78,7 +78,7 @@ a {
 }
 
 .main__container {
-    background: #FAFBFD;
+    background: #fafbfd;
 }
 
 #products-datatable td {
@@ -118,5 +118,9 @@ a {
 }
 .v-toolbar__title {
     color: #ffffff;
+}
+
+.v-main__wrap {
+    background: #FAFBFD;
 }
 </style>

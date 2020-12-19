@@ -1,4 +1,5 @@
 import numeral from 'numeral'
+import moment from 'moment'
 
 const dollarFilter = function(value) {
     if (!value) {
@@ -16,4 +17,14 @@ const percentFilter = function(value) {
     return `${Number(value).toFixed(2)}%`
 }
 
-export { dollarFilter, percentFilter }
+const formatDate = function(value) {
+    let date = ''
+
+    if (value) {
+        date = moment(String(value)).format('MM/DD/YYYY hh:mm')
+    }
+    return date
+
+}
+
+export { dollarFilter, percentFilter, formatDate }

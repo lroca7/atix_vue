@@ -2,7 +2,7 @@ import Vue from 'vue'
 import App from '@/App.vue'
 import vuetify from './plugins/vuetify'
 import router from '@/routers'
-import { dollarFilter, percentFilter } from '@/filters'
+import { dollarFilter, percentFilter, formatDate } from '@/filters'
 
 import EventBus from '@/plugins/event-bus'
 
@@ -10,13 +10,14 @@ Vue.use(EventBus)
 
 Vue.filter('money', dollarFilter)
 Vue.filter('percent', percentFilter)
+Vue.filter('formatDate', formatDate)
 
 Vue.config.productionTip = false
 
 // global variable
-//Vue.prototype.$apiUrl = 'http://127.0.0.1:8000/'
-Vue.prototype.$apiUrl = 'http://35.188.116.1:8000/'
-
+Vue.prototype.$apiUrl = 'http://127.0.0.1:8000/'
+// Vue.prototype.$apiUrl = 'http://35.188.116.1:8000/'
+// Vue.prototype.$apiUrl = process.env.VUE_URL_SERVER
 new Vue({
     router: router,
     vuetify,

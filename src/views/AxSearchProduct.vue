@@ -130,7 +130,7 @@ export default {
 
 <style scoped>
 .bar-search {
-    background: #E0E0E0;
+    background: #e0e0e0;
     border-radius: 0;
 }
 .search-products {
