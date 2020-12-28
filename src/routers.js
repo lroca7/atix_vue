@@ -9,6 +9,7 @@ import Unit from '@/views/Unit'
 import Ingredient from '@/views/Ingredient'
 import Tables from '@/views/Tables'
 import Orders from '@/views/Orders'
+import Invoices from '@/views/Invoices'
 import PreInvoice from '@/views/PreInvoice'
 import TableDetail from '@/views/AxTableDetail'
 
@@ -73,6 +74,11 @@ export default new Router({
             path: '/orders',
             name: 'orders',
             component: Orders
+        },
+        {
+            path: '/invoices',
+            name: 'invoices',
+            component: Invoices
         },
         {
             path: '/preinvoices',
