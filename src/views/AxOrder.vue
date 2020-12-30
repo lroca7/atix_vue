@@ -104,7 +104,6 @@
                 <v-card-title> Pre-Factura - {{ table.name }} </v-card-title>
                 <div class="d-flex flex-row justify-space-between pb-6">
                     <v-card class="invoice-info ma-4 pa-4">
-                        <div>
                             
                         <v-autocomplete
                             v-model="preInvoice.client"

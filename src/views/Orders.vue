@@ -66,6 +66,13 @@ export default {
                     sortable: true,
                     value: 'total',
                     width: '1%'
+                },
+                {
+                    text: 'Estado',
+                    align: 'start',
+                    sortable: true,
+                    value: 'state',
+                    width: '1%'
                 }
             ],
             orders: []
