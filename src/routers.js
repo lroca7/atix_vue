@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import Router from 'vue-router'
+import Login from '@/views/LoginPage'
 import Home from '@/views/Home'
 import Category from '@/views/Category'
 import Product from '@/views/Product'
@@ -9,8 +10,12 @@ import Unit from '@/views/Unit'
 import Ingredient from '@/views/Ingredient'
 import Tables from '@/views/Tables'
 import Orders from '@/views/Orders'
+import Invoices from '@/views/Invoices'
 import PreInvoice from '@/views/PreInvoice'
 import TableDetail from '@/views/AxTableDetail'
+import Users from '@/views/Users'
+import CasgRegiters from '@/views/CashRegisters'
+import Cash from '@/views/Cash'
 
 Vue.use(Router)
 
@@ -20,6 +25,11 @@ export default new Router({
     routes: [
         {
             path: '/',
+            name: 'login',
+            component: Login
+        },
+        {
+            path: '/home',
             name: 'home',
             component: Home
         },
@@ -75,9 +85,29 @@ export default new Router({
             component: Orders
         },
         {
+            path: '/invoices',
+            name: 'invoices',
+            component: Invoices
+        },
+        {
             path: '/preinvoices',
             name: 'PreInvoice',
             component: PreInvoice
-        }
+        },
+        {
+            path: '/users',
+            name: 'users',
+            component: Users
+        },
+        {
+            path: '/cashregister',
+            name: 'cashregister',
+            component: CasgRegiters
+        },
+        {
+            path: '/cash',
+            name: 'cash',
+            component: Cash
+        },
     ]
 })

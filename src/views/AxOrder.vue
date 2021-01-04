@@ -101,10 +101,9 @@
             max-width="70%"
         >
             <v-card>
-                <v-card-title> Pre-Factura - {{ table.name }} </v-card-title>
+                <v-card-title>Factura - {{ table.name }} </v-card-title>
                 <div class="d-flex flex-row justify-space-between pb-6">
                     <v-card class="invoice-info ma-4 pa-4">
-                            
                         <v-autocomplete
                             v-model="preInvoice.client"
                             :items="clients"
@@ -187,7 +186,7 @@
                     <v-btn depressed color="secondary" class="mr-4">
                         Cancelar
                     </v-btn>
-                    <v-btn depressed color="success">
+                    <v-btn depressed color="success" @click="newPreInvoice">
                         Generar
                     </v-btn>
                 </div>
@@ -411,15 +410,130 @@ export default {
         },
 
         sendFacturar() {
-            debugger
             let me = this
             if (me.order.id) {
                 alert('enviar a facturar')
                 me.dialogPreInvoice = true
+
+                me.getClients()
+                me.getPaymentMethod()
+                me.getUsers()
             } else {
                 alert('Primero debes realizar un pedido')
             }
-        }
+        },
+
+        getClients() {
+            console.log('getClients')
+            // Items have already been loaded
+            // if (this.itemsClient && this.itemsClient.length > 1) return
+
+            // Items have already been requested
+            if (this.isLoadingClient) return
+
+            this.isLoadingClient = true
+
+            fetch(`${this.$apiUrl}client/list`)
+                .then(res => res.json())
+                .then(res => {
+                    const { data } = res
+                    this.clients = data
+                })
+                .catch(err => {
+                    console.log(err)
+                })
+                .finally(() => (this.isLoadingClient = false))
+        },
+
+        getPaymentMethod() {
+            let me = this
+            // Items have already been loaded
+            // if (this.itemsClient && this.itemsClient.length > 1) return
+
+            // Items have already been requested
+            if (me.isLoadingPaymentMethod) return
+
+            me.isLoadingPaymentMethod = true
+
+            fetch(`${me.$apiUrl}waytopay/list`)
+                .then(res => res.json())
+                .then(res => {
+                    const { data } = res
+                    me.paymentMethods = data
+                })
+                .catch(err => {
+                    console.log(err)
+                })
+                .finally(() => (me.isLoadingPaymentMethod = false))
+        },
+
+        getUsers() {
+            // Items have already been loaded
+            // if (this.itemsClient && this.itemsClient.length > 1) return
+
+            // Items have already been requested
+            if (this.isLoadingUser) return
+
+            this.isLoadingUser = true
+
+            fetch(`${this.$apiUrl}user/list`)
+                .then(res => res.json())
+                .then(res => {
+                    const { data } = res
+                    this.users = data
+                })
+                .catch(err => {
+                    console.log(err)
+                })
+                .finally(() => (this.isLoadingUser = false))
+        },
+
+        newPreInvoice() {
+            let me = this
+            if (me.totalPreInvoice === null) {
+                me.totalPreInvoice = me.totalOrder
+            }
+            let data = {
+                tableInvoice: me.table.number,
+                order: {
+                    id: me.order.id
+                },
+                items: me.productsInOrder,
+                client: me.preInvoice.client,
+                responsable: me.preInvoice.user,
+                wayToPay: me.preInvoice.wayToPay,
+                discountCash: null,
+                discountPercentage: null,
+                tip: me.tip,
+                subTotal: me.totalOrder,
+                total: me.totalPreInvoice
+            }
+
+            fetch(`${me.$apiUrl}invoice/new`, {
+                method: 'POST',
+                body: JSON.stringify(data),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then(res => res.json())
+                .then(dataItem => {
+                    if (dataItem.id) {
+                        window.open(
+                            `${me.$apiUrl}invoice/print/client/${dataItem.id}`,
+                            'blank'
+                        )
+                        me.dialogPreInvoice = false
+                        me.dialogOrder = false
+                    } else {
+                        alert('Error: Al generear pre-factura')
+                    }
+                })
+                .catch(() => {
+                    console.error('Error al crear prefactura')
+                    alert('Error: Al crear prefactura')
+                })
+        },
     }
 }
 </script>

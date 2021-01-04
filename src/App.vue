@@ -1,30 +1,32 @@
 <template>
-    <v-app id="inspire" class="jajajaja">
-        <px-header :links="links" class="hidden-sm-and-down"></px-header>
-        <PxHeaderMobile
-            :links="links"
-            class="hidden-lg-and-up"
-        ></PxHeaderMobile>
-        <v-main>
-            <v-container class="main__container pa-8" fluid>
-                <router-view></router-view>
-            </v-container>
-        </v-main>
+    <v-app id="inspire">
+            <px-header v-if="isLogueado" class="hidden-sm-and-down"></px-header>
+
+            <!-- <PxHeaderMobile
+                class="hidden-lg-and-up"
+            ></PxHeaderMobile> -->
+            <v-main>
+                <v-container class="main__container pa-8" fluid>
+                    <router-view></router-view>
+                </v-container>
+            </v-main>
+        
+       
 
         <v-footer app class="wine-dark">
-            <span class="white--text">&copy; 2019</span>
+            <span class="white--text">&copy; 2021</span>
         </v-footer>
     </v-app>
 </template>
 
 <script>
 import PxHeader from '@/components/PxHeader'
-import PxHeaderMobile from '@/components/PxHeaderMobile'
+// import PxHeaderMobile from '@/components/PxHeaderMobile'
 
 export default {
     components: {
         PxHeader,
-        PxHeaderMobile
+        // PxHeaderMobile
     },
     props: {
         source: String
@@ -32,20 +34,20 @@ export default {
     data() {
         return {
             drawer: null,
-            links: [
-                {
-                    title: 'BTC',
-                    to: 'hola'
-                },
-                {
-                    title: 'ETH',
-                    to: { name: 'coin-detail', params: { id: 'ethereum' } }
-                },
-                {
-                    title: 'XRP',
-                    to: { name: 'coin-detail', params: { id: 'ripple' } }
-                }
-            ]
+            isLogueado: false
+        }
+    },
+
+    beforeCreated() {
+        console.log('uno')
+    },
+
+    created() {
+        console.log('dos')
+        const user = localStorage.getItem('user')
+
+        if (user !== null) {
+            this.isLogueado = true
         }
     }
 }

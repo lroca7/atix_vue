@@ -75,7 +75,13 @@ export default {
         fetch(`${this.$apiUrl}menu/list`)
             .then(response => response.json())
             .then(dataItems => {
-                me.menus = dataItems.data
+                dataItems.data.forEach(element => {
+                
+                if (element.name != 'Contabilidad') {
+                    me.menus.push(element)
+                }
+            });
+                // me.menus = dataItems.data
             })
     },
 
