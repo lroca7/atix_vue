@@ -1,6 +1,6 @@
 <template>
     <v-app id="inspire">
-            <px-header v-if="isLogueado" class="hidden-sm-and-down"></px-header>
+            <px-header v-on:logout="doSomething" v-if="isLogueado" class="hidden-sm-and-down"></px-header>
 
             <!-- <PxHeaderMobile
                 class="hidden-lg-and-up"
@@ -44,11 +44,18 @@ export default {
 
     created() {
         console.log('dos')
-        const user = localStorage.getItem('user')
+        const user = localStorage.getItem('ax_user_token')
 
         if (user !== null) {
             this.isLogueado = true
         }
+    },
+    methods: {
+        doSomething() {
+            this.isLogueado = !this.isLogueado
+            
+        },
+
     }
 }
 </script>

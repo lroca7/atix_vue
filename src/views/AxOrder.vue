@@ -368,6 +368,7 @@ export default {
                 .then(dataItem => {
                     me.order = dataItem
                     alert('Orden creada exitosamente')
+                    this.$router.push('/tables')
                 })
                 .then(() => {
                     if (me.generateInvoice === 1) {
@@ -412,7 +413,6 @@ export default {
         sendFacturar() {
             let me = this
             if (me.order.id) {
-                alert('enviar a facturar')
                 me.dialogPreInvoice = true
 
                 me.getClients()

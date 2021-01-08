@@ -40,6 +40,7 @@ export default {
             fetch(`${me.$apiUrl}table/list`)
                 .then(response => response.json())
                 .then(dataItems => {
+                    debugger
                     me.tables = dataItems.data
                 })
                 .catch(error => {

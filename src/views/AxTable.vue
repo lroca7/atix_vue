@@ -92,7 +92,7 @@ export default {
             if (this.table.state === 2) {
                 return 'green-table'
             }
-            //Mesa pre-factuarada
+            //Mesa Factuarada
             if (this.table.state === 3) {
                 return 'yellow-table'
             }
