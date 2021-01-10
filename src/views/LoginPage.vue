@@ -99,10 +99,11 @@ export default {
               localStorage.setItem('ax_user', JSON.stringify(data))
               localStorage.setItem('ax_user_token', 'allow')
               me.$router.push({ name: 'dashboard' })
-              // window.location.href = '/dashboard'
+              window.location.href = '/dashboard'
             } else {
               localStorage.removeItem('ax_user_token')
               me.$router.push({ name: 'login' })
+              window.location.href = '/'
               me.loginError = true
             }
           })
@@ -111,7 +112,7 @@ export default {
 
             localStorage.removeItem('ax_user_token')
             me.$router.push({ name: 'login' })
-
+            window.location.href = '/'
             this.$emit('logout')
 
             me.loginError = true
