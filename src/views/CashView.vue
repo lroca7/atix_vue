@@ -5,7 +5,7 @@
       <v-row>
         <v-col cols="12" md="6">
           <v-autocomplete
-            v-model="responsable"
+            v-model="product.responsable"
             :items="users"
             :loading="isLoadingUser"
             :search-input.sync="searchUser"
@@ -20,7 +20,7 @@
           <v-text-field
             label="Base"
             required
-            v-model="base"
+            v-model="product.base"
             type="number"
           ></v-text-field>
         </v-col>
@@ -40,7 +40,7 @@
 
 <script>
 export default {
-  name: 'Cash',
+  name: 'CashView',
 
   components: {},
   data() {
@@ -48,11 +48,16 @@ export default {
       responsable: null,
       users: [],
       isLoadingUser: false,
-      searchUser: null
+      searchUser: null,
+      product: {
+        responsable: null,
+        base: null
+      }
     }
   },
 
   created() {
+    this.initialize()
     this.getPaymentMethod()
     this.getUsers()
   },
@@ -60,6 +65,20 @@ export default {
   watch: {},
 
   methods: {
+
+    initialize() {
+      let me = this
+      const id = this.$route.params.id
+      fetch(`${this.$apiUrl}cashbalance/${id}`)
+        .then(response => response.json())
+        .then(dataItem => {
+          debugger
+          me.product = dataItem
+
+         
+        })
+    },
+
     getPaymentMethod() {
       let me = this
       // Items have already been requested

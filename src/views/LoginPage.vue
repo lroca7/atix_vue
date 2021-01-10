@@ -1,11 +1,35 @@
 <template>
   <div class="login-page">
     <div class="form-login">
-      <v-text-field label="Usuario" v-model="username"></v-text-field>
-      <v-text-field label="Contrasena" v-model="password"></v-text-field>
-      <v-btn class="mt-4" depressed color="primary" @click="login">
-        Ingresar
-      </v-btn>
+      <v-form v-model="valid">
+        <v-text-field
+          label="Usuario"
+          v-model="username"
+          required
+        ></v-text-field>
+        <!-- <v-text-field label="Contrasena" v-model="password" required></v-text-field> -->
+        <v-text-field
+          :append-icon="show3 ? 'mdi-eye' : 'mdi-eye-off'"
+          :type="show3 ? 'text' : 'password'"
+          name="input-10-2"
+          label="Contraseña"
+          v-model="password"
+          @click:append="show3 = !show3"
+        ></v-text-field>
+        <v-btn class="mt-4" depressed color="primary" @click="login">
+          Ingresar
+        </v-btn>
+        <v-alert
+          class="mt-8"
+          v-if="loginError"
+          text
+          prominent
+          type="error"
+          icon="mdi-cloud-alert"
+        >
+          Usuario o contraseña no validos
+        </v-alert>
+      </v-form>
     </div>
     <div class="login-image">
       <v-img
@@ -25,8 +49,22 @@ export default {
 
   data() {
     return {
-      username: null,
-      password: null
+      valid: false,
+      username: 'lizeth@atix.com',
+      emailRules: [
+        v => !!v || 'E-mail is required',
+        v => /.+@.+\..+/.test(v) || 'E-mail must be valid'
+      ],
+      // password: null,
+
+      show3: false,
+      password: 'atix123',
+      rules: {
+        required: value => !!value || ' ',
+        // min: v => v.length >= 8 || 'Min 8 characters',
+        emailMatch: () => `The email and password you entered don't match`
+      },
+      loginError: false
     }
   },
 
@@ -55,24 +93,28 @@ export default {
           }
         })
           .then(res => res.json())
-          .then((data) => {
-            console.log(data)
-            if(data.username){
-                localStorage.setItem('ax_user_token', 'allow')
-                this.$router.push('home')
-            }else{
-                localStorage.removeItem('ax_user_token')
-                this.$router.push('/')
+          .then(data => {
+            console.log('data', data)
+            if (data.username) {
+              localStorage.setItem('ax_user', JSON.stringify(data))
+              localStorage.setItem('ax_user_token', 'allow')
+              // this.$router.push('home')
+              window.location.href = '/dashboard'
+            } else {
+              localStorage.removeItem('ax_user_token')
+              this.$router.push('/')
+              me.loginError = true
             }
-            
           })
-          .catch( () => {
+          .catch(() => {
             console.error('Error: login')
 
             localStorage.removeItem('ax_user_token')
             this.$router.push('/')
 
-            this.$emit("logout");
+            this.$emit('logout')
+
+            me.loginError = true
           })
       }
     }

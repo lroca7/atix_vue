@@ -19,7 +19,7 @@ Vue.prototype.$apiUrl = 'http://127.0.0.1:8000/'
 // Vue.prototype.$apiUrl = 'http://35.188.116.1:8000/'
 // Vue.prototype.$apiUrl = process.env.VUE_URL_SERVER
 new Vue({
-    router: router,
-    vuetify,
-    render: h => h(App)
+  router: router,
+  vuetify,
+  render: h => h(App)
 }).$mount('#app')

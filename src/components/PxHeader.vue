@@ -52,7 +52,7 @@
               <v-menu offset-y>
                 <template v-slot:activator="{ on, attrs }">
                   <v-btn text v-bind="attrs" v-on="on">
-                    Angela
+                    {{ user.firstname }}
                   </v-btn>
                 </template>
                 <v-list>
@@ -60,7 +60,9 @@
                     <v-list-item-title>Perfil</v-list-item-title>
                   </v-list-item>
                   <v-list-item>
-                    <v-list-item-title @click=logout>Cerrar Sesión</v-list-item-title>
+                    <v-list-item-title @click="logout"
+                      >Cerrar Sesión</v-list-item-title
+                    >
                   </v-list-item>
                 </v-list>
               </v-menu>
@@ -82,6 +84,9 @@ export default {
       drawer: null,
       menus: [],
       submenus: [],
+      user: {
+        firstname: ''
+      }
     }
   },
 
@@ -108,6 +113,12 @@ export default {
         })
         // me.menus = dataItems.data
       })
+
+    let user = localStorage.getItem('ax_user')
+    user = JSON.parse(user)
+    if (user.firstname) {
+      me.user = user
+    }
   },
 
   methods: {
@@ -125,10 +136,9 @@ export default {
     },
 
     logout() {
-      this.$emit("logout");
+      this.$emit('logout')
       localStorage.removeItem('ax_user_token')
       this.$router.push('/')
-       
     }
   }
 }
