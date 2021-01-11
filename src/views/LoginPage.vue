@@ -98,7 +98,7 @@ export default {
             if (data.username) {
               localStorage.setItem('ax_user', JSON.stringify(data))
               localStorage.setItem('ax_user_token', 'allow')
-              me.$router.push({ name: 'dashboard' })
+              me.$router.push({ name: 'home' })
               window.location.href = '/'
             } else {
               localStorage.removeItem('ax_user_token')
