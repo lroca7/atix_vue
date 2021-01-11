@@ -103,7 +103,7 @@ export default {
       console.log(me)
       this.$router.push({
         name: 'tabledetail',
-        params: { id: this.table.number, table: this.table }
+        params: { id: this.table.number, table: me.table }
       })
       // if (me.dialogOrder) {
       //     fetch(`${me.$apiUrl}product/list`)

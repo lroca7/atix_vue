@@ -140,8 +140,16 @@ export default {
       this.$router.push({ name: 'cash' })
     },
 
-    viewCash(item) {
+    viewCash(item) {    
       this.$router.push({ name: 'cash-view',  params: { id: item.id } })
+    }
+  },
+
+  notifications: {
+    showNotification: { // You can have any name you want instead of 'showLoginError'
+      title: 'Login Failed',
+      message: 'Failed to authenticate',
+      type: 'error' // You also can use 'VueNotifications.types.error' instead of 'error'
     }
   }
 }

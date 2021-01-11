@@ -132,4 +132,17 @@ a {
 .v-main__wrap {
   background: #fafbfd;
 }
+
+.mini-toastr {
+  top: 70px !important;
+}
+.toast {
+  top: 70px !important;
+}
+
+.toast {
+  /* color: yellow !important; */
+  font-family: "Roboto", sans-serif;
+  font-weight: normal;
+}
 </style>

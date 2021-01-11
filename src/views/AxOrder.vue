@@ -86,16 +86,16 @@
           >
             Facturar
           </v-btn>
-          <v-btn depressed color="primary">
+          <v-btn depressed color="primary" @click="pay">
             Pagar
           </v-btn>
         </div>
       </div>
     </template>
 
-    <v-dialog class="box-facturar" v-model="dialogPreInvoice" max-width="70%">
+    <v-dialog class="box-facturar" v-model="dialogPreInvoice" max-width="40%">
       <v-card>
-        <v-card-title>Factura - {{ table.name }} </v-card-title>
+        <v-card-title>Factura - {{ table.name }} </v-card-title>        
         <div class="d-flex flex-row justify-space-between pb-6">
           <v-card class="invoice-info ma-4 pa-4">
             <v-autocomplete
@@ -108,16 +108,7 @@
               label="Cliente"
               return-object
             ></v-autocomplete>
-            <v-autocomplete
-              v-model="preInvoice.wayToPay"
-              :items="paymentMethods"
-              :loading="isLoadingPaymentMethod"
-              :search-input.sync="searchPaymentMethod"
-              item-text="name"
-              item-value="id"
-              label="Forma de pago"
-              return-object
-            ></v-autocomplete>
+
             <v-autocomplete
               v-model="preInvoice.user"
               :items="users"
@@ -128,8 +119,6 @@
               label="Usuario"
               return-object
             ></v-autocomplete>
-            <!-- </v-card>
-                    <v-card class="invoice-resume ma-4 pa-4"> -->
             <v-row>
               <v-col class="pb-0 d-flex align-center">
                 Subtotal
@@ -162,14 +151,6 @@
                 {{ totalPreInvoice | money }}
               </v-col>
             </v-row>
-            <v-row>
-              <v-col class="pb-0 d-flex align-center">
-                Propina
-              </v-col>
-              <v-col class="pb-0 d-flex align-center">
-                <v-text-field v-model="tip"></v-text-field>
-              </v-col>
-            </v-row>
           </v-card>
         </div>
         <div class="d-flex justify-end pa-6">
@@ -182,14 +163,73 @@
         </div>
       </v-card>
     </v-dialog>
+
+    <v-dialog class="box-pagar" v-model="dialogPay" max-width="40%"  v-on:cierra="closePayDialogTwo">
+      <AxPayment v-bind:table="table" v-bind:tip="tip" v-bind:payment="payment" v-bind:order="order" />
+      <!-- <v-card>
+        <v-card-title>Pago - {{ table.name }} </v-card-title>
+        <div class="">
+          <v-card class="invoice-info ma-4 pa-4">
+            <v-row>
+              <v-col class="pb-0 align-center">
+                <v-autocomplete
+                  v-model="payment.wayToPay"
+                  :items="paymentMethods"
+                  :loading="isLoadingPaymentMethod"
+                  :search-input.sync="searchPaymentMethod"
+                  item-text="name"
+                  item-value="id"
+                  label="Forma de pago"
+                  return-object
+                ></v-autocomplete>
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col class="pb-0 align-center">
+                <v-text-field
+                  number
+                  v-model="tip"
+                  label="Propina"
+                ></v-text-field>
+              </v-col>
+            </v-row>
+
+            <v-row class="flex-column">
+              <v-col class="pb-0">
+                Total a pagar
+              </v-col>
+              <v-col class="pb-0">
+                {{ order.total | money }}
+              </v-col>
+            </v-row>
+          </v-card>
+        </div>
+        <div class="d-flex justify-end pa-6">
+          <v-btn
+            depressed
+            color="secondary"
+            class="mr-4"
+            @click="closePayDialog"
+          >
+            Cancelar
+          </v-btn>
+          <v-btn depressed color="success" @click="paySave">
+            Pagar
+          </v-btn>
+        </div>
+      </v-card> -->
+    </v-dialog>
   </v-card>
 </template>
 
 <script>
+import VueNotifications from 'vue-notifications'
+import AxPayment from '@/views/AxPayment'
+
 export default {
   name: 'AxOrder',
   props: ['table'],
-  components: {},
+  components: { AxPayment },
   data() {
     return {
       productsInOrder: [],
@@ -207,7 +247,6 @@ export default {
       discountPercentage: null,
       discountCash: null,
       totalPreInvoice: null,
-      tip: null,
 
       //Combo clientes
       clients: [],
@@ -224,19 +263,31 @@ export default {
       isLoadingUser: false,
       searchUser: null,
 
-      showFacturar: true
+      showFacturar: true,
+
+      dialogPay: false,
+
+      totalOrdenInitial: 0,
+
+      tip: 0,
+      payment: {
+        wayToPay: null
+      }
     }
   },
 
   created() {
 
     debugger
+    
     this.$bus.$on('addProductToOrder', product => {
       this.addProduct(product)
     })
 
     this.getOrderByTable()
   },
+
+  
 
   methods: {
     addProduct(product) {
@@ -309,33 +360,39 @@ export default {
     },
 
     getOrderByTable() {
+
+      debugger
       let me = this
       fetch(`${me.$apiUrl}order/by/table/${me.table.number}`)
         .then(response => response.json())
         .then(dataItem => {
-          debugger
-          me.order = dataItem
-          me.productsInOrder = dataItem.items
-          me.mode = 1
-          me.showButton = false
 
-          me.productsInOrder = me.productsInOrder.map(p => {
-            let productInOrder = p
-            productInOrder.isOld = true
-            return productInOrder
-          })
+          if(dataItem.state !== 4) {
 
-          if (me.order.preInvoice !== 'undefined') {
-            console.log('La orden tiene prefactura activa')
-            me.isLoadingClient = false
-            me.preInvoice.client = me.order.preInvoice.client
-            me.clients = [me.preInvoice.client]
-            // me.isLoadingClient = false
+            me.order = dataItem
+            me.productsInOrder = dataItem.items
+            me.mode = 1
+            me.showButton = false
 
-            me.isLoadingUser = false
-            me.preInvoice.user = me.order.preInvoice.responsable
-            me.users = [me.preInvoice.user]
-            // me.isLoadingUser = false
+            me.productsInOrder = me.productsInOrder.map(p => {
+              let productInOrder = p
+              productInOrder.isOld = true
+              return productInOrder
+            })
+
+            if (me.order.preInvoice !== 'undefined') {
+              console.log('La orden tiene prefactura activa')
+              me.isLoadingClient = false
+              me.preInvoice.client = me.order.preInvoice.client
+              me.clients = [me.preInvoice.client]
+              // me.isLoadingClient = false
+
+              me.isLoadingUser = false
+              me.preInvoice.user = me.order.preInvoice.responsable
+              me.users = [me.preInvoice.user]
+              // me.isLoadingUser = false
+            }
+
           }
         })
         .catch(() => {
@@ -512,6 +569,8 @@ export default {
         .then(res => res.json())
         .then(dataItem => {
           if (dataItem.id) {
+            debugger
+            me.invoice = dataItem
             window.open(
               `${me.$apiUrl}invoice/print/client/${dataItem.id}`,
               'blank'
@@ -526,6 +585,49 @@ export default {
           console.error('Error al crear prefactura')
           alert('Error: Al crear prefactura')
         })
+    },
+
+    closePayDialogTwo() {
+      debugger
+      this.dialogPay = false
+    },
+
+    pay() {
+      let me = this
+      if (me.order.id) {
+        if (this.order.id) {
+          me.getPaymentMethod()
+          const totalOrder = JSON.parse(JSON.stringify(this.order))
+          this.totalOrdenInitial = totalOrder.total
+        }
+
+        me.dialogPay = true
+      }
+    },
+
+
+  },
+
+  notifications: {
+    showSuccessMsg: {
+      type: VueNotifications.types.success,
+      title: 'Hello there',
+      message: "That's the success!"
+    },
+    showInfoMsg: {
+      type: VueNotifications.types.info,
+      title: 'Hey you',
+      message: 'Here is some info for you'
+    },
+    showWarnMsg: {
+      type: VueNotifications.types.warn,
+      title: 'Wow, man',
+      message: "That's the kind of warning"
+    },
+    showErrorMsg: {
+      type: VueNotifications.types.error,
+      title: 'Wow-wow',
+      message: "That's the error"
     }
   }
 }

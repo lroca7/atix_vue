@@ -39,6 +39,7 @@
 </template>
 
 <script>
+import VueNotifications from 'vue-notifications'
 export default {
   name: 'Cash',
 
@@ -48,7 +49,8 @@ export default {
       responsable: null,
       users: [],
       isLoadingUser: false,
-      searchUser: null
+      searchUser: null,
+      base: null
     }
   },
 
@@ -112,40 +114,66 @@ export default {
 
     save() {
       let me = this
-      let data = {
-        responsable: me.responsable,
-        base: me.base,
-        state: me.state
-      }
 
-      fetch(`${this.$apiUrl}cashbalance/new`, {
-        method: 'POST',
-        body: JSON.stringify(data),
-        headers: {
-          'Content-Type': 'application/json'
+      if (me.responsable !== null) {
+        let data = {
+          responsable: me.responsable,
+          base: me.base,
+          state: me.state
         }
-      })
-        .then(res => res.json())
 
-        .then((response) => {
-          if(response.error === undefined) {
-            me.alertType = 'success'
-            me.showAlert = true
-            me.alertText = 'Caja creada exitosamente'
-            me.$router.push({
-              name: 'cashregister'
-            })
-          }else{
-            alert('Error:' + response.msj)
+        fetch(`${this.$apiUrl}cashbalance/new`, {
+          method: 'POST',
+          body: JSON.stringify(data),
+          headers: {
+            'Content-Type': 'application/json'
           }
-          
         })
-        .catch(error => {
-          console.error('Error:', error)
-          me.alertType = 'error'
-          me.showAlert = true
-          me.alertText = error
-        })
+          .then(res => res.json())
+
+          .then(response => {
+            if (response.error === undefined) {
+              me.alertType = 'success'
+              me.showAlert = true
+              me.alertText = 'Caja creada exitosamente'
+              me.$router.push({
+                name: 'cashregister'
+              })
+            } else {
+              this.showErrorMsg({ message: response.msj })
+              // alert('Error:' + response.msj)
+            }
+          })
+          .catch(error => {
+            console.error('Error:', error)
+            this.showErrorMsg({ message: error })
+          })
+      }else{
+        this.showErrorMsg({ message: 'Responsable es requerido' })
+      }
+    }
+  },
+
+  notifications: {
+    showSuccessMsg: {
+      type: VueNotifications.types.success,
+      title: 'Hello there',
+      message: "That's the success!"
+    },
+    showInfoMsg: {
+      type: VueNotifications.types.info,
+      title: 'Hey you',
+      message: 'Here is some info for you'
+    },
+    showWarnMsg: {
+      type: VueNotifications.types.warn,
+      title: 'Wow, man',
+      message: "That's the kind of warning"
+    },
+    showErrorMsg: {
+      type: VueNotifications.types.error,
+      title: 'Wow-wow',
+      message: "That's the error"
     }
   }
 }

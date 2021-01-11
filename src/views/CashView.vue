@@ -26,6 +26,11 @@
         </v-col>
       </v-row>
     </div>
+
+    <div class="sales">
+      <h4>Ventas</h4>
+    </div>
+
     <v-card-actions>
       <v-spacer></v-spacer>
       <v-btn depressed color="primary" @click="save">
@@ -72,7 +77,6 @@ export default {
       fetch(`${this.$apiUrl}cashbalance/${id}`)
         .then(response => response.json())
         .then(dataItem => {
-          debugger
           me.product = dataItem
 
          

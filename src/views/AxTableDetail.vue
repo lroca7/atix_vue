@@ -1,7 +1,7 @@
 <template>
   <v-card>
     <!-- <v-card-title> {{ table.name }} </v-card-title> -->
-    <v-card-title>{{ table.name }}</v-card-title>
+    <v-card-title>{{ table ? table.name : '' }}</v-card-title>
     <v-card class="wrapper-order pb-6">
       <AxSearchProduct />
 
@@ -17,6 +17,8 @@ export default {
   name: 'AxTableDetail',
   components: { AxSearchProduct, AxOrder },
   props: ['table', 'orders'],
+
+  
 
   created() {
     if (this.table === undefined) {

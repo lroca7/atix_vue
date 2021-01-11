@@ -586,7 +586,6 @@ export default {
         name: `Receta - ${me.product.name}`,
         ingredients: this.ingredientesAgregados
       }
-      debugger
       if (me.recipeId) {
         data.recipe.id = me.recipeId
       }
