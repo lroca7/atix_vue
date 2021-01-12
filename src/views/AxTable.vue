@@ -10,6 +10,8 @@
         @click.stop="dialogOrder = true"
       />
       <p>{{ table.name }}</p>
+      
+      <p v-if="table.order">{{ table.order.total | money }}</p>
     </v-card>
     <v-dialog class="pre-invoice" v-model="dialogPreInvoice" max-width="50%">
     </v-dialog>

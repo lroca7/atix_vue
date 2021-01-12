@@ -157,17 +157,17 @@ export default {
   notifications: {
     showSuccessMsg: {
       type: VueNotifications.types.success,
-      title: 'Hello there',
+      title: 'Ok',
       message: "That's the success!"
     },
     showInfoMsg: {
       type: VueNotifications.types.info,
-      title: 'Hey you',
+      title: 'Hey',
       message: 'Here is some info for you'
     },
     showWarnMsg: {
       type: VueNotifications.types.warn,
-      title: 'Wow, man',
+      title: 'Wow',
       message: "That's the kind of warning"
     },
     showErrorMsg: {

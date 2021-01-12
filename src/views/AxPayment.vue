@@ -103,14 +103,13 @@ export default {
     },
 
     closePayDialog() {
-      debugger
-      this.$emit("cierra");
+      const me = this
+      me.$emit('closePayDialog')
     },
 
     paySave() {
       const me = this
 
-      debugger
       if (me.payment.wayToPay) {
         let data = {
           order: {
@@ -135,6 +134,7 @@ export default {
           .then(dataItem => {
             if (dataItem.state === 'ok') {
               this.showSuccessMsg({ message: 'Pago generado exitosamente' })
+              me.$emit('closePayDialog')
             } else {
               this.showErrorMsg({ message: dataItem.msj })
             }
@@ -151,17 +151,17 @@ export default {
   notifications: {
     showSuccessMsg: {
       type: VueNotifications.types.success,
-      title: 'Hello there',
+      title: 'Ok',
       message: "That's the success!"
     },
     showInfoMsg: {
       type: VueNotifications.types.info,
-      title: 'Hey you',
+      title: 'Hey',
       message: 'Here is some info for you'
     },
     showWarnMsg: {
       type: VueNotifications.types.warn,
-      title: 'Wow, man',
+      title: 'Wow',
       message: "That's the kind of warning"
     },
     showErrorMsg: {

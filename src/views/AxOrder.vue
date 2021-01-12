@@ -94,142 +94,23 @@
     </template>
 
     <v-dialog class="box-facturar" v-model="dialogPreInvoice" max-width="40%">
-      <v-card>
-        <v-card-title>Factura - {{ table.name }} </v-card-title>        
-        <div class="d-flex flex-row justify-space-between pb-6">
-          <v-card class="invoice-info ma-4 pa-4">
-            <v-autocomplete
-              v-model="preInvoice.client"
-              :items="clients"
-              :loading="isLoadingClient"
-              :search-input.sync="searchClient"
-              item-text="fullname"
-              item-value="id"
-              label="Cliente"
-              return-object
-            ></v-autocomplete>
-
-            <v-autocomplete
-              v-model="preInvoice.user"
-              :items="users"
-              :loading="isLoadingUser"
-              :search-input.sync="searchUser"
-              item-text="firstname"
-              item-value="id"
-              label="Usuario"
-              return-object
-            ></v-autocomplete>
-            <v-row>
-              <v-col class="pb-0 d-flex align-center">
-                Subtotal
-              </v-col>
-              <v-col class="pb-0 d-flex align-center">
-                {{ totalOrder | money }}
-              </v-col>
-            </v-row>
-            <v-row>
-              <v-col class="pb-0 d-flex align-center">
-                Descuento (%)
-              </v-col>
-              <v-col class="pb-0 d-flex align-center">
-                <v-text-field v-model="discountPercentage"></v-text-field>
-              </v-col>
-            </v-row>
-            <v-row>
-              <v-col class="pb-0 d-flex align-center">
-                Descuento ($)
-              </v-col>
-              <v-col class="pb-0 d-flex align-center">
-                <v-text-field v-model="discountCash"></v-text-field>
-              </v-col>
-            </v-row>
-            <v-row>
-              <v-col class="pb-0 d-flex align-center">
-                Total
-              </v-col>
-              <v-col class="pb-0 d-flex align-center">
-                {{ totalPreInvoice | money }}
-              </v-col>
-            </v-row>
-          </v-card>
-        </div>
-        <div class="d-flex justify-end pa-6">
-          <v-btn depressed color="secondary" class="mr-4">
-            Cancelar
-          </v-btn>
-          <v-btn depressed color="success" @click="newPreInvoice">
-            Generar
-          </v-btn>
-        </div>
-      </v-card>
+     <AxInvoice v-bind:table="table" v-bind:preInvoice="preInvoice"/>
     </v-dialog>
-
-    <v-dialog class="box-pagar" v-model="dialogPay" max-width="40%"  v-on:cierra="closePayDialogTwo">
-      <AxPayment v-bind:table="table" v-bind:tip="tip" v-bind:payment="payment" v-bind:order="order" />
-      <!-- <v-card>
-        <v-card-title>Pago - {{ table.name }} </v-card-title>
-        <div class="">
-          <v-card class="invoice-info ma-4 pa-4">
-            <v-row>
-              <v-col class="pb-0 align-center">
-                <v-autocomplete
-                  v-model="payment.wayToPay"
-                  :items="paymentMethods"
-                  :loading="isLoadingPaymentMethod"
-                  :search-input.sync="searchPaymentMethod"
-                  item-text="name"
-                  item-value="id"
-                  label="Forma de pago"
-                  return-object
-                ></v-autocomplete>
-              </v-col>
-            </v-row>
-            <v-row>
-              <v-col class="pb-0 align-center">
-                <v-text-field
-                  number
-                  v-model="tip"
-                  label="Propina"
-                ></v-text-field>
-              </v-col>
-            </v-row>
-
-            <v-row class="flex-column">
-              <v-col class="pb-0">
-                Total a pagar
-              </v-col>
-              <v-col class="pb-0">
-                {{ order.total | money }}
-              </v-col>
-            </v-row>
-          </v-card>
-        </div>
-        <div class="d-flex justify-end pa-6">
-          <v-btn
-            depressed
-            color="secondary"
-            class="mr-4"
-            @click="closePayDialog"
-          >
-            Cancelar
-          </v-btn>
-          <v-btn depressed color="success" @click="paySave">
-            Pagar
-          </v-btn>
-        </div>
-      </v-card> -->
+    <v-dialog class="box-pagar" v-model="dialogPay" max-width="40%" >
+      <AxPayment v-bind:table="table" v-bind:tip="tip" v-bind:payment="payment" v-bind:order="order" v-on:closePayDialog="cloasePayDialog" />      
     </v-dialog>
   </v-card>
 </template>
 
 <script>
 import VueNotifications from 'vue-notifications'
+import AxInvoice from '@/views/AxInvoice'
 import AxPayment from '@/views/AxPayment'
 
 export default {
   name: 'AxOrder',
   props: ['table'],
-  components: { AxPayment },
+  components: { AxPayment, AxInvoice },
   data() {
     return {
       productsInOrder: [],
@@ -248,20 +129,6 @@ export default {
       discountCash: null,
       totalPreInvoice: null,
 
-      //Combo clientes
-      clients: [],
-      isLoadingClient: false,
-      searchClient: null,
-
-      //Combo formas de pago
-      paymentMethods: [],
-      isLoadingPaymentMethod: false,
-      searchPaymentMethod: null,
-
-      //Combo Usuarios
-      users: [],
-      isLoadingUser: false,
-      searchUser: null,
 
       showFacturar: true,
 
@@ -270,21 +137,21 @@ export default {
       totalOrdenInitial: 0,
 
       tip: 0,
-      payment: {
-        wayToPay: null
-      }
+
     }
   },
 
   created() {
 
-    debugger
     
     this.$bus.$on('addProductToOrder', product => {
       this.addProduct(product)
     })
 
     this.getOrderByTable()
+
+    
+
   },
 
   
@@ -361,7 +228,6 @@ export default {
 
     getOrderByTable() {
 
-      debugger
       let me = this
       fetch(`${me.$apiUrl}order/by/table/${me.table.number}`)
         .then(response => response.json())
@@ -417,18 +283,16 @@ export default {
 
         .then(dataItem => {
           me.order = dataItem
-          alert('Orden creada exitosamente')
+          this.showSuccessMsg({ message: 'Orden creada' })
           this.$router.push('/tables')
         })
         .then(() => {
-          if (me.generateInvoice === 1) {
-            alert('Ahora si, creemos la factura')
+          if (me.generateInvoice === 1) {            
             me.sendPreInvoice()
           }
         })
         .catch(error => {
-          console.error('Error:', error)
-          alert('Error:', error)
+          this.showErrorMsg({ message: error })
         })
         .finally(() => {
           if (me.generateInvoice === 1) {
@@ -449,14 +313,12 @@ export default {
         }
       })
         .then(res => res.json())
-
         .then(() => {
-          // alert('Orden actualizada')
+          this.showSuccessMsg({ message: 'Orden actualizada' })
           me.getOrderByTable()
         })
         .catch(error => {
-          console.error('Error:', error)
-          alert('Error:', error)
+          this.showErrorMsg({ message: error })
         })
     },
 
@@ -465,9 +327,9 @@ export default {
       if (me.order.id) {
         me.dialogPreInvoice = true
 
-        me.getClients()
-        me.getPaymentMethod()
-        me.getUsers()
+        // me.getClients()
+        // me.getPaymentMethod()
+        // me.getUsers()
       } else {
         alert('Primero debes realizar un pedido')
       }
@@ -569,7 +431,6 @@ export default {
         .then(res => res.json())
         .then(dataItem => {
           if (dataItem.id) {
-            debugger
             me.invoice = dataItem
             window.open(
               `${me.$apiUrl}invoice/print/client/${dataItem.id}`,
@@ -587,8 +448,11 @@ export default {
         })
     },
 
-    closePayDialogTwo() {
-      debugger
+    closeInvoiceDialog() {
+      this.dialogPreInvoice = false  
+    },
+
+    cloasePayDialog() {
       this.dialogPay = false
     },
 
@@ -596,7 +460,7 @@ export default {
       let me = this
       if (me.order.id) {
         if (this.order.id) {
-          me.getPaymentMethod()
+          // me.getPaymentMethod()
           const totalOrder = JSON.parse(JSON.stringify(this.order))
           this.totalOrdenInitial = totalOrder.total
         }
@@ -611,17 +475,17 @@ export default {
   notifications: {
     showSuccessMsg: {
       type: VueNotifications.types.success,
-      title: 'Hello there',
+      title: 'Ok',
       message: "That's the success!"
     },
     showInfoMsg: {
       type: VueNotifications.types.info,
-      title: 'Hey you',
+      title: 'Hey',
       message: 'Here is some info for you'
     },
     showWarnMsg: {
       type: VueNotifications.types.warn,
-      title: 'Wow, man',
+      title: 'Wow',
       message: "That's the kind of warning"
     },
     showErrorMsg: {
