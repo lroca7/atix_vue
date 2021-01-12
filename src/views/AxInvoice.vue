@@ -1,7 +1,7 @@
 <template>
   <v-card>
     <v-card-title>Factura - {{ table.name }} </v-card-title>
-    <div class="d-flex flex-row justify-space-between pb-6">
+    <div class="flex-row justify-space-between pb-6">
       <v-card class="invoice-info ma-4 pa-4">
         <v-autocomplete
           v-model="preInvoice.client"
@@ -21,41 +21,43 @@
           :search-input.sync="searchUser"
           item-text="firstname"
           item-value="id"
-          label="Usuario"
+          label="Responsable"
           return-object
         ></v-autocomplete>
-        <v-row>
-          <v-col class="pb-0 d-flex align-center">
-            Subtotal
-          </v-col>
-          <v-col class="pb-0 d-flex align-center">
-            {{ totalOrder | money }}
-          </v-col>
-        </v-row>
-        <v-row>
-          <v-col class="pb-0 d-flex align-center">
-            Descuento (%)
-          </v-col>
-          <v-col class="pb-0 d-flex align-center">
-            <v-text-field v-model="discountPercentage"></v-text-field>
-          </v-col>
-        </v-row>
-        <v-row>
-          <v-col class="pb-0 d-flex align-center">
-            Descuento ($)
-          </v-col>
-          <v-col class="pb-0 d-flex align-center">
-            <v-text-field v-model="discountCash"></v-text-field>
-          </v-col>
-        </v-row>
-        <v-row>
-          <v-col class="pb-0 d-flex align-center">
-            Total
-          </v-col>
-          <v-col class="pb-0 d-flex align-center">
-            {{ totalPreInvoice | money }}
-          </v-col>
-        </v-row>
+        <div class="flex-column">
+          <v-row>
+            <v-col class="pb-0 d-flex align-center">
+              Subtotal
+            </v-col>
+            <v-col class="pb-0 d-flex align-center">
+              {{ totalOrder | money }}
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col class="pb-0 d-flex align-center">
+              Descuento (%)
+            </v-col>
+            <v-col class="pb-0 d-flex align-center">
+              <v-text-field v-model="discountPercentage"></v-text-field>
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col class="pb-0 d-flex align-center">
+              Descuento ($)
+            </v-col>
+            <v-col class="pb-0 d-flex align-center">
+              <v-text-field v-model="discountCash" disabled></v-text-field>
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col class="pb-0 d-flex align-center">
+              Total
+            </v-col>
+            <v-col class="pb-0 d-flex align-center">
+              {{ totalPreInvoice | money }}
+            </v-col>
+          </v-row>
+        </div>
       </v-card>
     </div>
     <div class="d-flex justify-end pa-6">
@@ -75,12 +77,20 @@
 </template>
 
 <script>
+import VueNotifications from 'vue-notifications'
 export default {
   name: 'AxInvoice',
-  props: ['table', 'preInvoice'],
+  props: ['table', 'order', 'totalOrder'],
 
   data() {
     return {
+      preInvoice: {
+        client: {},
+        wayToPay: {},
+        user: {}
+      },
+      totalPreInvoice: null,
+
       //Combo clientes
       clients: [],
       isLoadingClient: false,
@@ -89,13 +99,30 @@ export default {
       //Combo Usuarios
       users: [],
       isLoadingUser: false,
-      searchUser: null
+      searchUser: null,
+
+      discountPercentage: null,
+      discountCash: null
     }
   },
 
   created() {
-    this.getClients()
-    this.getUsers()
+    const me = this
+
+    me.getClients()
+    me.getUsers()
+
+    me.totalPreInvoice = me.order.total
+  },
+
+  watch: {
+    discountPercentage() {
+      let discount = (this.totalOrder * this.discountPercentage) / 100
+
+      this.discountCash = discount
+
+      this.totalPreInvoice = this.totalOrder - this.discountCash
+    }
   },
 
   methods: {
@@ -140,6 +167,89 @@ export default {
           console.log(err)
         })
         .finally(() => (this.isLoadingUser = false))
+    },
+
+    closeInvoiceDialog() {
+      this.$emit('closeInvoiceDialog')
+    },
+
+    newPreInvoice() {
+      let me = this
+      if (me.totalPreInvoice === null) {
+        me.totalPreInvoice = me.totalOrder
+      }
+
+      if (me.preInvoice.user.id !== undefined) {
+        let data = {
+          tableInvoice: me.table.number,
+          order: {
+            id: me.order.id
+          },
+          items: me.productsInOrder,
+          client: me.preInvoice.client,
+          responsable: me.preInvoice.user,
+          wayToPay: me.preInvoice.wayToPay,
+          discountCash: null,
+          discountPercentage: null,
+          tip: me.tip,
+          subTotal: me.totalOrder,
+          total: me.totalPreInvoice
+        }
+
+        fetch(`${me.$apiUrl}invoice/new`, {
+          method: 'POST',
+          body: JSON.stringify(data),
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        })
+          .then(res => res.json())
+          .then(dataItem => {
+            if (dataItem.id) {
+              me.invoice = dataItem
+              window.open(
+                `${me.$apiUrl}invoice/print/client/${dataItem.id}`,
+                'blank'
+              )
+              me.dialogPreInvoice = false
+              me.dialogOrder = false
+
+              this.$router.push({
+                name: 'tables'
+              })
+            } else {
+              this.showErrorMsg({ message: 'Error al generar factura' })
+            }
+          })
+          .catch(() => {
+            this.showErrorMsg({ message: 'Al crear factura' })
+          })
+      } else {
+        this.showWarnMsg({ message: 'Selecciona un responsable' })
+      }
+    }
+  },
+
+  notifications: {
+    showSuccessMsg: {
+      type: VueNotifications.types.success,
+      title: 'Ok',
+      message: "That's the success!"
+    },
+    showInfoMsg: {
+      type: VueNotifications.types.info,
+      title: 'Hey',
+      message: 'Here is some info for you'
+    },
+    showWarnMsg: {
+      type: VueNotifications.types.warn,
+      title: 'Wow',
+      message: "That's the kind of warning"
+    },
+    showErrorMsg: {
+      type: VueNotifications.types.error,
+      title: 'Wow-wow',
+      message: "That's the error"
     }
   }
 }

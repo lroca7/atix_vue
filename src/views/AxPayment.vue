@@ -49,10 +49,15 @@ import VueNotifications from 'vue-notifications'
 
 export default {
   name: 'AxPayment',
-  props: ['payment', 'table', 'tip', 'order'],
+  props: ['table', 'order', 'totalOrdenInitial'],
 
   data() {
     return {
+      payment: {
+        wayToPay: null
+      },
+      tip: null,
+
       //Combo formas de pago
       paymentMethods: [],
       isLoadingPaymentMethod: false,
@@ -67,13 +72,14 @@ export default {
   watch: {
     tip() {
       const me = this
-
       let newTotal = parseFloat(me.totalOrdenInitial)
 
       if (parseFloat(me.tip) > 0) {
         newTotal = parseFloat(me.totalOrdenInitial) + parseFloat(me.tip)
+        // console.log('Total 1 ->', newTotal)
         me.order.total = newTotal
       } else {
+        // console.log('Total 2 ->', me.totalOrdenInitial)
         me.order.total = me.totalOrdenInitial
       }
     }
@@ -135,6 +141,9 @@ export default {
             if (dataItem.state === 'ok') {
               this.showSuccessMsg({ message: 'Pago generado exitosamente' })
               me.$emit('closePayDialog')
+              this.$router.push({
+                name: 'tables'
+              })
             } else {
               this.showErrorMsg({ message: dataItem.msj })
             }

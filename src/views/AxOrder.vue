@@ -69,7 +69,7 @@
       <p class="subtitles mt-6">Total: {{ totalOrder | money }}</p>
       <div class="d-flex justify-space-between">
         <div class="d-flex justify-space-between mt-10">
-          <v-btn depressed color="info" @click="sendOrder">
+          <v-btn  v-if="showMakePedido" depressed color="info" @click="sendOrder">
             Hacer pedido
           </v-btn>
         </div>
@@ -94,10 +94,20 @@
     </template>
 
     <v-dialog class="box-facturar" v-model="dialogPreInvoice" max-width="40%">
-     <AxInvoice v-bind:table="table" v-bind:preInvoice="preInvoice"/>
+      <AxInvoice
+        v-bind:table="table"
+        v-bind:order="order"
+        v-bind:totalOrder="totalOrder"
+        v-on:closeInvoiceDialog="closeInvoiceDialog"
+      />
     </v-dialog>
-    <v-dialog class="box-pagar" v-model="dialogPay" max-width="40%" >
-      <AxPayment v-bind:table="table" v-bind:tip="tip" v-bind:payment="payment" v-bind:order="order" v-on:closePayDialog="cloasePayDialog" />      
+    <v-dialog class="box-pagar" v-model="dialogPay" max-width="40%">
+      <AxPayment
+        v-bind:table="table"
+        v-bind:order="order"
+        v-bind:totalOrdenInitial="totalOrdenInitial"
+        v-on:closePayDialog="cloasePayDialog"
+      />
     </v-dialog>
   </v-card>
 </template>
@@ -118,43 +128,25 @@ export default {
       order: {},
       showButton: true,
 
-      preInvoice: {
-        client: {},
-        wayToPay: {},
-        user: {}
-      },
       dialogPreInvoice: false,
 
-      discountPercentage: null,
-      discountCash: null,
-      totalPreInvoice: null,
-
-
+      showMakePedido: true,
       showFacturar: true,
 
       dialogPay: false,
 
       totalOrdenInitial: 0,
 
-      tip: 0,
-
     }
   },
 
   created() {
-
-    
     this.$bus.$on('addProductToOrder', product => {
       this.addProduct(product)
     })
 
     this.getOrderByTable()
-
-    
-
   },
-
-  
 
   methods: {
     addProduct(product) {
@@ -227,46 +219,50 @@ export default {
     },
 
     getOrderByTable() {
-
       let me = this
-      fetch(`${me.$apiUrl}order/by/table/${me.table.number}`)
-        .then(response => response.json())
-        .then(dataItem => {
+      if (me.table) {
+        fetch(`${me.$apiUrl}order/by/table/${me.table.number}`)
+          .then(response => response.json())
+          .then(dataItem => {
 
-          if(dataItem.state !== 4) {
-
-            me.order = dataItem
-            me.productsInOrder = dataItem.items
-            me.mode = 1
-            me.showButton = false
-
-            me.productsInOrder = me.productsInOrder.map(p => {
-              let productInOrder = p
-              productInOrder.isOld = true
-              return productInOrder
-            })
-
-            if (me.order.preInvoice !== 'undefined') {
-              console.log('La orden tiene prefactura activa')
-              me.isLoadingClient = false
-              me.preInvoice.client = me.order.preInvoice.client
-              me.clients = [me.preInvoice.client]
-              // me.isLoadingClient = false
-
-              me.isLoadingUser = false
-              me.preInvoice.user = me.order.preInvoice.responsable
-              me.users = [me.preInvoice.user]
-              // me.isLoadingUser = false
+            if (dataItem.state === 3) {
+              me.showFacturar = false
+              me.showMakePedido = false
             }
 
-          }
-        })
-        .catch(() => {
-          console.log('Note: Mesa sin orden activa')
-        })
-        .finally(() => {
-          me.calculateTotalOrder()
-        })
+            if (dataItem.state !== 4) {
+              me.order = dataItem
+              me.productsInOrder = dataItem.items
+              me.mode = 1
+              me.showButton = false
+
+              me.productsInOrder = me.productsInOrder.map(p => {
+                let productInOrder = p
+                productInOrder.isOld = true
+                return productInOrder
+              })
+
+              if (me.order.preInvoice !== 'undefined') {
+                console.log('La orden tiene prefactura activa')
+                me.isLoadingClient = false
+                me.preInvoice.client = me.order.preInvoice.client
+                me.clients = [me.preInvoice.client]
+                // me.isLoadingClient = false
+
+                me.isLoadingUser = false
+                me.preInvoice.user = me.order.preInvoice.responsable
+                me.users = [me.preInvoice.user]
+                // me.isLoadingUser = false
+              }
+            }
+          })
+          .catch(() => {
+            console.log('Note: Mesa sin orden activa')
+          })
+          .finally(() => {
+            me.calculateTotalOrder()
+          })
+      }
     },
 
     newOrder(data) {
@@ -287,7 +283,7 @@ export default {
           this.$router.push('/tables')
         })
         .then(() => {
-          if (me.generateInvoice === 1) {            
+          if (me.generateInvoice === 1) {
             me.sendPreInvoice()
           }
         })
@@ -400,56 +396,8 @@ export default {
         .finally(() => (this.isLoadingUser = false))
     },
 
-    newPreInvoice() {
-      let me = this
-      if (me.totalPreInvoice === null) {
-        me.totalPreInvoice = me.totalOrder
-      }
-      let data = {
-        tableInvoice: me.table.number,
-        order: {
-          id: me.order.id
-        },
-        items: me.productsInOrder,
-        client: me.preInvoice.client,
-        responsable: me.preInvoice.user,
-        wayToPay: me.preInvoice.wayToPay,
-        discountCash: null,
-        discountPercentage: null,
-        tip: me.tip,
-        subTotal: me.totalOrder,
-        total: me.totalPreInvoice
-      }
-
-      fetch(`${me.$apiUrl}invoice/new`, {
-        method: 'POST',
-        body: JSON.stringify(data),
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      })
-        .then(res => res.json())
-        .then(dataItem => {
-          if (dataItem.id) {
-            me.invoice = dataItem
-            window.open(
-              `${me.$apiUrl}invoice/print/client/${dataItem.id}`,
-              'blank'
-            )
-            me.dialogPreInvoice = false
-            me.dialogOrder = false
-          } else {
-            alert('Error: Al generear pre-factura')
-          }
-        })
-        .catch(() => {
-          console.error('Error al crear prefactura')
-          alert('Error: Al crear prefactura')
-        })
-    },
-
     closeInvoiceDialog() {
-      this.dialogPreInvoice = false  
+      this.dialogPreInvoice = false
     },
 
     cloasePayDialog() {
@@ -467,9 +415,7 @@ export default {
 
         me.dialogPay = true
       }
-    },
-
-
+    }
   },
 
   notifications: {
