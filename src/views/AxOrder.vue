@@ -86,6 +86,15 @@
           >
             Facturar
           </v-btn>
+          <v-btn
+            v-if="!showFacturar"
+            depressed
+            color="orange"
+            class="mr-4"
+            @click="printInvoice"
+          >
+            Imprimir
+          </v-btn>
           <v-btn depressed color="primary" @click="pay">
             Pagar
           </v-btn>
@@ -329,6 +338,14 @@ export default {
       } else {
         alert('Primero debes realizar un pedido')
       }
+    },
+
+    printInvoice(){
+      const me = this
+      window.open(
+                `${me.$apiUrl}invoice/print/client/${me.order.invoice.id}`,
+                'blank'
+              )
     },
 
     getClients() {
