@@ -69,7 +69,12 @@
       <p class="subtitles mt-6">Total: {{ totalOrder | money }}</p>
       <div class="d-flex justify-space-between">
         <div class="d-flex justify-space-between mt-10">
-          <v-btn  v-if="showMakePedido" depressed color="info" @click="sendOrder">
+          <v-btn
+            v-if="showMakePedido"
+            depressed
+            color="info"
+            @click="continueOrder"
+          >
             Hacer pedido
           </v-btn>
         </div>
@@ -101,6 +106,27 @@
         </div>
       </div>
     </template>
+
+    <v-dialog class="box-mesero" v-model="dialogMesero" max-width="40%">
+      <v-card>
+        <v-card-title>Factura - {{ table.name }} </v-card-title>
+        <div class="flex-row justify-space-between pb-6">
+          <v-card class="invoice-info ma-4 pa-4">
+            <v-autocomplete
+              v-model="order.user"
+              :items="users"
+              :loading="isLoadingUser"
+              :search-input.sync="searchUser"
+              item-text="firstname"
+              item-value="id"
+              label="Responsable"
+              return-object
+              @change="continueOrder"
+            ></v-autocomplete>
+          </v-card>
+        </div>
+      </v-card>
+    </v-dialog>
 
     <v-dialog class="box-facturar" v-model="dialogPreInvoice" max-width="40%">
       <AxInvoice
@@ -134,7 +160,9 @@ export default {
     return {
       productsInOrder: [],
       totalOrder: 0,
-      order: {},
+      order: {
+        user: null
+      },
       showButton: true,
 
       dialogPreInvoice: false,
@@ -146,6 +174,11 @@ export default {
 
       totalOrdenInitial: 0,
 
+      dialogMesero: false,
+      //Combo Usuarios
+      users: [],
+      isLoadingUser: false,
+      searchUser: null
     }
   },
 
@@ -211,20 +244,40 @@ export default {
 
       console.log('Total orden: ', me.totalOrder)
     },
+    continueOrder() {
+      const me = this
+
+      me.getUsers()
+      me.dialogMesero = true
+
+      if (me.order.user !== null) { 
+        me.dialogMesero = false
+
+        setTimeout(() => {
+          me.sendOrder()
+        }, 300);
+        
+      }
+    },
+
     sendOrder() {
       let me = this
-      let data = {
-        products: me.productsInOrder,
-        total: me.totalOrder,
-        tableNumber: me.table.number,
-        table: me.table
+
+      if (me.order.user !== null) {
+        let data = {
+          products: me.productsInOrder,
+          total: me.totalOrder,
+          tableNumber: me.table.number,
+          table: me.table
+        }
+
+        if (me.order.id) {
+          me.updateOrder(data)
+        } else {
+          me.newOrder(data)
+        }
       }
 
-      if (me.order.id) {
-        me.updateOrder(data)
-      } else {
-        me.newOrder(data)
-      }
     },
 
     getOrderByTable() {
@@ -233,7 +286,6 @@ export default {
         fetch(`${me.$apiUrl}order/by/table/${me.table.number}`)
           .then(response => response.json())
           .then(dataItem => {
-
             if (dataItem.state === 3) {
               me.showFacturar = false
               me.showMakePedido = false
@@ -340,12 +392,12 @@ export default {
       }
     },
 
-    printInvoice(){
+    printInvoice() {
       const me = this
       window.open(
-                `${me.$apiUrl}invoice/print/client/${me.order.invoice.id}`,
-                'blank'
-              )
+        `${me.$apiUrl}invoice/print/client/${me.order.invoice.id}`,
+        'blank'
+      )
     },
 
     getClients() {
