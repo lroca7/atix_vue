@@ -209,7 +209,7 @@ export default {
               me.invoice = dataItem
               window.open(
                 `${me.$apiUrl}invoice/print/client/${dataItem.id}`,
-                'blank'
+                '_blank'
               )
               me.dialogPreInvoice = false
               me.dialogOrder = false
