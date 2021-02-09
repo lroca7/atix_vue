@@ -1,11 +1,11 @@
 <template>
-  <v-card>
-    <!-- <v-card-title> {{ table.name }} </v-card-title> -->
-    <v-card-title>{{ table ? table.name : '' }}</v-card-title>
+  <v-card >
+    <v-card-title>{{ table !== undefined ? table.name : '' }}</v-card-title>
+    <v-card-subtitle >Mesero {{ responsable !== null ? responsable.firstname : '' }}</v-card-subtitle>
     <v-card class="wrapper-order pb-6">
       <AxSearchProduct />
 
-      <AxOrder v-bind:table="table" />
+      <AxOrder v-bind:table="table" v-on:writeResponsable="writeResponsable"/>
     </v-card>
   </v-card>
 </template>
@@ -17,14 +17,27 @@ export default {
   name: 'AxTableDetail',
   components: { AxSearchProduct, AxOrder },
   props: ['table', 'orders'],
-
-  
+  data()  {
+    return {
+      responsable: null
+    }
+  },
 
   created() {
     if (this.table === undefined) {
       this.$router.push({
         name: 'tables'
       })
+    }
+  },
+
+  methods: {
+    writeResponsable(responsable) {
+
+      console.log('JAJAJA')
+      const me = this
+
+      me.responsable = responsable
     }
   }
 }

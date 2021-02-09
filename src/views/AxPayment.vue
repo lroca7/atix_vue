@@ -23,13 +23,41 @@
           </v-col>
         </v-row>
 
-        <v-row class="flex-column">
-          <v-col class="pb-0">
-            Total a pagar
+        <v-row class="flex-column ">
+          <v-col class="pb-0 d-flex justify-center">
+            <b>Total a pagar</b>
           </v-col>
-          <v-col class="pb-0">
-            {{ order.total | money }}
+          <v-col class="pb-0 d-flex justify-center">
+            <b>{{ order.total | money }}</b>
           </v-col>
+        </v-row>
+
+        <v-row class="flex-column mt-6">
+          <v-btn depressed color="info" @click="addRow">
+            Otro medio de pago
+          </v-btn>
+        </v-row>
+        <v-row id="others">
+          <div class="d-flex container other-method" v-for="(input, index) in inputs" :key="input.id">
+            <v-col cols="6">
+              <v-autocomplete
+                :items="paymentMethods"
+                :loading="isLoadingPaymentMethod"
+                :search-input.sync="searchPaymentMethod"
+                item-text="name"
+                item-value="id"
+                label="Forma de pago"
+                return-object
+              ></v-autocomplete>
+            </v-col>
+
+            <v-col cols="4"><v-text-field label="Valor"></v-text-field></v-col>
+            <v-col cols="2" class="d-flex align-center">
+              <button @click="deleteRow(index)">
+                <v-icon>mdi-delete</v-icon>
+              </button>
+              </v-col>
+          </div>
         </v-row>
       </v-card>
     </div>
@@ -37,7 +65,7 @@
       <v-btn depressed color="secondary" class="mr-4" @click="closePayDialog">
         Cancelar
       </v-btn>
-      <v-btn depressed color="success" @click="paySave">
+      <v-btn depressed color="primary" @click="paySave">
         Pagar
       </v-btn>
     </div>
@@ -62,6 +90,8 @@ export default {
       paymentMethods: [],
       isLoadingPaymentMethod: false,
       searchPaymentMethod: null,
+
+      inputs: []
     }
   },
 
@@ -116,6 +146,7 @@ export default {
     paySave() {
       const me = this
 
+      debugger
       if (me.payment.wayToPay) {
         let data = {
           order: {
@@ -151,9 +182,20 @@ export default {
           .catch(() => {
             this.showErrorMsg({ message: 'Al registar el pago' })
           })
-      }else {
-       this.showWarnMsg({ message: 'Indica la forma de pago' }) 
+      } else {
+        this.showWarnMsg({ message: 'Indica la forma de pago' })
       }
+    },
+
+    addRow() {
+      this.inputs.push({
+        one: '',
+        two: ''
+      })
+    },
+
+    deleteRow(index) {
+      this.inputs.splice(index, 1)
     }
   },
 
@@ -182,4 +224,11 @@ export default {
 }
 </script>
 
-<style></style>
+<style>
+ul li {
+  list-style: none;
+}
+.other-method{
+  /* height: 70px; */
+}
+</style>

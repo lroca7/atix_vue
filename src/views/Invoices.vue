@@ -8,7 +8,17 @@
       :items-per-page="10"
       class="elevation-1"
       :search="filter"
+      
     >
+      <template #item.wayToPay="{item}">
+         <span
+            class="chips-categories ma-2"
+            v-for="wp in item.wayToPay"
+            :key="wp.name"
+          >
+            {{ wp.name }}
+          </span>
+      </template>
       <template v-slot:top>
         <v-toolbar flat class="toolbar-color">
           <template>
@@ -22,6 +32,7 @@
               hide-details
             ></v-text-field>
           </template>
+          
         </v-toolbar>
       </template>
     </v-data-table>
@@ -58,6 +69,13 @@ export default {
           align: 'start',
           sortable: true,
           value: 'tableInvoice',
+          width: '1%'
+        },
+        {
+          text: 'Forma de pago',
+          align: 'start',
+          sortable: true,
+          value: 'wayToPay',
           width: '1%'
         },
         {

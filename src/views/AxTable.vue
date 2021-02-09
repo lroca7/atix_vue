@@ -3,14 +3,15 @@
     <v-card
       v-bind:class="classObject"
       class="ax-table pa-2 ma-2 d-flex flex-column justify-center align-center"
+      @click="dialogOrder"
     >
       <img
         class="ax-table--img"
         :src="getImgUrl(table)"
-        @click.stop="dialogOrder = true"
+        
       />
       <p>{{ table.name }}</p>
-      
+
       <p v-if="table.order">{{ table.order.total | money }}</p>
     </v-card>
     <v-dialog class="pre-invoice" v-model="dialogPreInvoice" max-width="50%">
@@ -21,14 +22,13 @@
 <script>
 // import AxSearchProduct from '@/views/AxSearchProduct.vue'
 // import AxOrder from '@/views/AxOrder.vue'
+import VueNotifications from 'vue-notifications'
 export default {
   name: 'AxTable',
   // components: { AxSearchProduct, AxOrder },
   props: ['table', 'orders'],
   data() {
     return {
-      dialogOrder: false,
-
       allProducts: [],
 
       productsInOrder: [],
@@ -100,68 +100,7 @@ export default {
   },
 
   watch: {
-    dialogOrder() {
-      let me = this
-      console.log(me)
-      this.$router.push({
-        name: 'tabledetail',
-        params: { id: this.table.number, table: me.table }
-      })
-      // if (me.dialogOrder) {
-      //     fetch(`${me.$apiUrl}product/list`)
-      //         .then(response => response.json())
-      //         .then(dataItems => {
-      //             me.products = dataItems.data
-      //             me.allProducts = dataItems.data
-
-      //             me.products.map(function(obj) {
-      //                 if (obj.parentProduct) {
-      //                     let name =
-      //                         obj.name + ' - ' + obj.parentProduct.name
-      //                     obj.name = name
-      //                 }
-      //                 return obj
-      //             })
-      //         })
-
-      //     me.getOrderByTable()
-      // } else {
-      // console.log('Reinicicar orden')
-      // me.dialogOrder = false
-      // me.products = []
-      // me.allProducts = []
-      // me.filter = ''
-      // me.productsInOrder = []
-      // me.totalOrder = 0
-      // me.mode = 0
-      // me.order = {}
-      // me.dialogPreInvoice = false
-      // me.discountPercentage = null
-      // me.discountCash = null
-      // me.totalPreInvoice = null
-      // me.tip = null
-
-      // me.clients = []
-      // me.isLoadingClient = false
-      // me.searchClient = null
-
-      // me.paymentMethods = []
-      // me.isLoadingPaymentMethod = false
-      // me.searchPaymentMethod = null
-
-      // me.users = []
-      // me.isLoadingUser = false
-      // me.searchUser = null
-
-      // me.preInvoice = {
-      //     client: {},
-      //     wayToPay: {},
-      //     user: {}
-      // }
-      // //Emitir una actualizacion a tables
-      // this.$emit('updateTables')
-      // }
-    },
+    
     filter() {
       let me = this
       if (!me.filter) {
@@ -184,6 +123,29 @@ export default {
   },
 
   methods: {
+    
+    dialogOrder() {
+      let me = this
+
+      fetch(`${me.$apiUrl}cashbalance/active`)
+        .then(response => response.json())
+        .then(dataItems => {
+          if (dataItems.data.length === 1) {
+            this.$router.push({
+              name: 'tabledetail',
+              params: { id: this.table.number, table: me.table }
+            })
+          } else {
+            this.showWarnMsg({ message: 'No hay caja activa' })
+          }
+        })
+        .catch(error => {
+          this.showErrorMsg({ message: 'Al consultar caja activa' })
+          console.error(error)
+        })
+
+    },
+
     getImgUrl(table) {
       var images = require.context('../../public/', false, /\.png$/)
       if (table.name === 'To Go') {
@@ -419,13 +381,6 @@ export default {
           console.error('Error:', error)
           alert('Error:', error)
         })
-        .finally(() => {
-          if (me.generateInvoice === 1) {
-            me.dialogOrder = true
-          } else {
-            me.dialogOrder = false
-          }
-        })
     },
 
     updateOrder(data) {
@@ -447,6 +402,28 @@ export default {
           console.error('Error:', error)
           alert('Error:', error)
         })
+    }
+  },
+  notifications: {
+    showSuccessMsg: {
+      type: VueNotifications.types.success,
+      title: 'Ok',
+      message: "That's the success!"
+    },
+    showInfoMsg: {
+      type: VueNotifications.types.info,
+      title: 'Hey',
+      message: 'Here is some info for you'
+    },
+    showWarnMsg: {
+      type: VueNotifications.types.warn,
+      title: 'Wow',
+      message: "That's the kind of warning"
+    },
+    showErrorMsg: {
+      type: VueNotifications.types.error,
+      title: 'Wow-wow',
+      message: "That's the error"
     }
   }
 }

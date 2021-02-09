@@ -133,6 +133,9 @@ export default {
             me.drawer = true
           }
         })
+        .catch((error) => {
+          console.error('Error' + error)
+        })
     },
 
     logout() {

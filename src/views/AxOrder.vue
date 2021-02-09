@@ -268,7 +268,11 @@ export default {
           products: me.productsInOrder,
           total: me.totalOrder,
           tableNumber: me.table.number,
-          table: me.table
+          table: me.table,
+          responsable: {
+            id: me.order.user.id,
+            email: me.order.user.email
+          }
         }
 
         if (me.order.id) {
@@ -286,6 +290,8 @@ export default {
         fetch(`${me.$apiUrl}order/by/table/${me.table.number}`)
           .then(response => response.json())
           .then(dataItem => {
+
+
             if (dataItem.state === 3) {
               me.showFacturar = false
               me.showMakePedido = false
@@ -296,6 +302,11 @@ export default {
               me.productsInOrder = dataItem.items
               me.mode = 1
               me.showButton = false
+
+
+              console.log('Responsable de la mesa -> ', me.order.responsable)
+
+              me.$emit('writeResponsable', me.order.responsable)
 
               me.productsInOrder = me.productsInOrder.map(p => {
                 let productInOrder = p
@@ -315,6 +326,8 @@ export default {
                 me.users = [me.preInvoice.user]
                 // me.isLoadingUser = false
               }
+
+              
             }
           })
           .catch(() => {

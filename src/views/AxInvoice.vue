@@ -113,6 +113,8 @@ export default {
     me.getUsers()
 
     me.totalPreInvoice = me.order.total
+
+    me.preInvoice.user = me.order.responsable
   },
 
   watch: {

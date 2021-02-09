@@ -5,7 +5,7 @@
       <v-row>
         <v-col cols="12" md="6">
           <v-autocomplete
-            v-model="product.responsable"
+            v-model="cash.responsable"
             :items="users"
             :loading="isLoadingUser"
             :search-input.sync="searchUser"
@@ -20,7 +20,7 @@
           <v-text-field
             label="Base"
             required
-            v-model="product.base"
+            v-model="cash.base"
             type="number"
           ></v-text-field>
         </v-col>
@@ -29,6 +29,9 @@
 
     <div class="sales">
       <h4>Ventas</h4>
+
+
+
     </div>
 
     <v-card-actions>
@@ -54,7 +57,7 @@ export default {
       users: [],
       isLoadingUser: false,
       searchUser: null,
-      product: {
+      cash: {
         responsable: null,
         base: null
       }
@@ -65,6 +68,7 @@ export default {
     this.initialize()
     this.getPaymentMethod()
     this.getUsers()
+    
   },
 
   watch: {},
@@ -77,9 +81,8 @@ export default {
       fetch(`${this.$apiUrl}cashbalance/${id}`)
         .then(response => response.json())
         .then(dataItem => {
-          me.product = dataItem
-
-         
+          me.cash = dataItem
+          me.getSales()
         })
     },
 
@@ -169,6 +172,21 @@ export default {
           me.showAlert = true
           me.alertText = error
         })
+    },
+
+    getSales() {
+      const me = this
+
+      const invoices = me.cash.invoices
+
+      
+      debugger
+
+      console.log(invoices.find(me.findEfectivo));
+    },
+
+    findEfectivo(fruta) {
+      return fruta.wayToPay.name === 'Credito';
     }
   }
 }
